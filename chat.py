@@ -49,26 +49,31 @@ def main():
 
     sessionToID = {}
     for id in relatedID:
-        print("ID: {}".format(id))
-        session, whispermodel, seglen, bs, stride, index = id.split("_")
+        session, _, _, bs, stride, index = id.split("_")
 
         index = int(index)
-        bs = int(bs[2:])
-        stride = int(stride[3:])
 
-        print("Adding id {} to session {}".format(index, session))
-        if(session in sessionToID):
-            sessionToID[session].append((index, bs, stride))
+        sessionCode = session + "_" + bs + "_" + stride
+
+        if(sessionCode in sessionToID): 
+            sessionToID[sessionCode].append(index)
         else:
-            sessionToID[session] = [(index, bs, stride)]
+            sessionToID[sessionCode] = [index]
 
-    uniqueSessions = sorted(list(sessionToID.keys()))
-    sessionToIndexToText = {}
-    for uniqueSession in uniqueSessions:
-        sessionToIndexToText[uniqueSession] = embeddingToText(os.path.join(args.path, uniqueSession, '{}.csv'.format(uniqueSession)))
+    sessionToIndexToText = {} 
+    for session in sessionToID:
+        session_date, bs, stride = session.split("_")
+
+        sessionToIndexToText[session] = embeddingToText(os.path.join(args.path, session_date, "{}_{}.csv".format(bs, stride)))
+        
 
     sessionToText = {}
     for session in sorted(list(sessionToID.keys())):
+        session_date, bs, stride = session.split("_")
+
+        bs = int(bs[2:])
+        stride = int(stride[3:])
+
         sessionToText[session] = ""
 
         if(len(sessionToID[session]) <= 1):
@@ -77,43 +82,27 @@ def main():
         else:
             for i in range(len(sessionToID[session])-1):
                 #grab the current and next session. Look for overlap. Remove if present.
-                currentTup = sorted(sessionToID[session])[i]
-                nextTup    = sorted(sessionToID[session])[i+1]
+                currentInd = sorted(sessionToID[session])[i]
+                nextInd    = sorted(sessionToID[session])[i+1]
 
-                if(nextTup[0] - currentTup[0] < currentTup[1]): #If the difference between indices is < the batch, we know there must be (some) overlap, so we should account for that...
-                    howMuchOverlap = nextTup[0] - currentTup[0]
+                if(nextInd - currentInd < bs): #If the difference between indices is < the batch, we know there must be (some) overlap, so we should account for that...
+                    howMuchOverlap = nextInd - currentInd
 
-                    currentText = sessionToIndexToText[session][currentTup[0]]
+                    currentText = sessionToIndexToText[session][currentInd]
                     currentLines = currentText.split("\n")
 
                     sessionToText[session] += "\n".join(currentLines[:howMuchOverlap])
 
                 else:
-                    sessionToText[session] += sessionToIndexToText[session][currentTup[0]] + '\n'
+                    sessionToText[session] += sessionToIndexToText[session][currentInd] + '\n'
 
-            sessionToText[session] += sessionToIndexToText[session][sorted(sessionToID[session])[-1][0]]
+            sessionToText[session] += sessionToIndexToText[session][sorted(sessionToID[session])[-1]]
 
-    #allText = []
-    #relatedID = [int(i.split('_')[-1]) for i in relatedID]
-    #for rid in relatedID:
-    #    allText.append(e2t[rid])
-
-    #print("Original Token Cnt: {}".format(estimateTokens("\n".join(allText))))
-    #print("New Token Count: {}".format(sum([estimateTokens(sessionToText[i]) for i in sessionToText] )))
-    #input()
-
-    #for i in sessionToText:
-    #    print("SESSION: {}".format(i))
-    #    print(sessionToText[i])
-    #    print("********************************************************\n\n")
-    #    input()
 
     allText = "\n".join(sessionToText[i] for i in sessionToText)
-    #print(allText)
-    #input()
+
 
     print("Querying OpenAI using {} | {} Tokens...".format(args.model, estimateTokens(allText)))
-    #print("\n".join(allText))
     response = openai.ChatCompletion.create(
         model=args.model,
         messages = [
@@ -121,12 +110,10 @@ def main():
             {'role':'user', 'content':'Below is a query provided by the user. You should use the information provided further down to answer this query as well as possible.'},
             {'role':'user', 'content': args.query},
             {'role':'user', 'content': 'Below is the context provided. You will see a text transcript of a dungeons and dragons campaign. Each line is labeled with a speaker. Here are the speaker codes, names, and character / role:\n1) cro: Crossland (DM)\n2) let: Leticia (Russet Crow)\n3) ric: Richard (Likkvorn)\n4) sim: Simon (Lief) 5) ben: Ben (Oskar) 6) kacie: Kacie (Isra). Please read through what was said, and help with the query as best you can.'},
-            #{'role':'user', 'content':"\n".join(allText)}
             {'role':'user', 'content':allText}
         ]
     )
 
-    #print(response)
     print("\n\n\n~~~ Chat GPT Says ~~~")
     print(response['choices'][0]['message']['content'])
     
