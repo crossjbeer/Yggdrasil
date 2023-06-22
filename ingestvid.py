@@ -103,6 +103,13 @@ def main(path, savepath, savename):
         print("No MKV files found.")
         return
     
+    if(not os.path.exists(savepath)):
+        try:
+            os.makedirs(savepath)
+        except:
+            print("Failure building save path [{}]".format(savepath))
+            exit()
+    
     if(not savename):
         p = Path(path)
         pparts = p.parts 
