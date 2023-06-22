@@ -81,10 +81,8 @@ if __name__ == '__main__':
 
         tdf = pd.DataFrame([[i, full_str, embeddings, model, prompt_tokens, total_tokens]], 
                            columns=['index', 'text', 'embedding', 'model', 'prompt_tokens', 'total_tokens'], index=[i])
-        #endName = args.path.split("/")[-1]
 
         res = pd.concat([res, tdf], axis=0)
-        #res.to_csv(os.path.join(save_dir, endName))
         res.to_csv(os.path.join(save_dir, 'BS{}_STR{}.csv'))
 
         if(args.pinecone):
@@ -100,6 +98,8 @@ if __name__ == '__main__':
             except Exception as e:
                 print("Error uploading {}".format(cid))
                 print(e)
+
+    pinecone.deinit()
 
 
 
