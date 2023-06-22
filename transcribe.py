@@ -4,11 +4,10 @@ import os
 import json 
 import soundfile as sf 
 import pandas as pd 
-import mysql.connector
-import datetime as dt 
+from pathlib import Path
 
 
-def transcribe_wav(wav, model, lang):
+def transcribe_wav(wav, model):
     """
     Transcribes the audio file using the Whisper model and returns the transcription result as a dictionary.
 
@@ -26,11 +25,10 @@ def transcribe_wav(wav, model, lang):
     except Exception as e:
         raise ValueError("Failed to load model or audio file.") from e
 
-    #try:
-    #result_dict = wisp.transcribe(model, audio, language=lang)
-    result_dict = wisp.transcribe(model, audio)
-    #except Exception as e:
-    #    raise ValueError("Transcription failed.") from e
+    try:
+        result_dict = wisp.transcribe(model, audio)
+    except Exception as e:
+        raise ValueError("Transcription failed.") from e
 
     return result_dict
 
@@ -101,97 +99,47 @@ def segment_audio(segDF, wav, savepath, lead=0, tail=0):
         except Exception as e:
             raise ValueError(f"Failed to save segment {i+1} as a WAV file.") from e
 
-def save_transcription_to_mysql(res_dict, mysql_config, session, whispermodel):
-    segments = res_dict['segments']
-
-    try:
-        connection = mysql.connector.connect(**mysql_config)
-        cursor = connection.cursor()
-
-        # Insert each segment into the MySQL table
-        for segment in segments:
-            #id = segment[id]
-            start = segment['start']
-            end = segment['end']
-            text = segment['text']
-            temp = segment['temperature']
-            now = dt.datetime.now()
-            
-
-            insert_query = """
-            INSERT INTO transcript (session, whisper, text, start, end, upload)
-            VALUES (%s, %s, %s, %s, %s, %s)
-            """
-            cursor.execute(insert_query, (session, whispermodel, text, start, end, now))
-
-        connection.commit()
-        print("Transcription data saved to MySQL.")
-
-        # Close the cursor and connection
-        cursor.close()
-        connection.close()
-
-    except mysql.connector.Error as error:
-        print(f"Failed to save transcription data to MySQL: {error}")
-
-
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Whisper ASR Transcription')
-
     parser.add_argument('-p', '--path', help='Path to the .wav file', required=True)
     parser.add_argument('-m', '--model', help='Whisper Model to Use [tiny.en, small.en, base.en, medium.en, large.en]', default='base')
+    parser.add_argument('-sp', '--savepath', help='Path to save .json', default=None)
+    parser.add_argument('-sn', '--savename', help='Name to save transcription .csv under', required=False, type=str)
     parser.add_argument('--segment', help='option to segment provided .wav file and save to savepath', action='store_true')
-    parser.add_argument('-sp', '--savepath', help='Path to save segmented audio', type=str)
-    parser.add_argument('--host', help='MySQL host', default='localhost', required=False)
-    parser.add_argument('--db', help='MySQL database name', required=False)
-    parser.add_argument('--user', help='MySQL username', required=False)
-    parser.add_argument('--password', help='MySQL password', required=False)
-    parser.add_argument('--session', help='Session name', required=True)
-    parser.add_argument('--lang', default='en', help='Language to Transcribe', required=False)
     args = parser.parse_args()
 
     # Check if the provided path exists
     if(not os.path.exists(args.path)):
         raise ValueError("Input file path does not exist.")
-    if(not args.path.endswith('wav')):
-        raise ValueError("Input file [{}] is not a .wav!".format(args.path))
-    
-    if(args.segment):
-        if(not args.savepath):
-            #print("Savepath must be provided if segment is requested...")
-            raise ValueError("<savepath> must be provided as arg if segmentation is requested...")
-        elif(not os.path.exists(args.savepath)):
+
+    # Check if the save path exists, and if not, attempt to create it
+    if(args.savepath):
+        if(not os.path.exists(args.savepath)):
             try:
+                print("Building save dir...")
                 os.makedirs(args.savepath)
             except Exception as e:
-                print("Unable to build save path [{}]...{}".format(args.savepath, e))
-                exit()
-    
-    mysql_config = {
-        'host': args.host,
-        'database': args.db,
-        'user': args.user,
-        'password': args.password
-    }
+                raise ValueError("Failed to create the save directory.") from e
 
-    print("Transcribing {} with Model {}".format(args.path, args.model))
-    res_dict = transcribe_wav(args.path, args.model, args.lang)
-    print('Transcription Complete. Saving Result...')
+        # Determine the savename based on the provided argument or the filename of the input WAV file
+        savename = args.savename
+        if(not savename):
+            savename = Path(args.path).parts[-1].split('.')[0]
 
-    # Save the transcription to MySQL
-    if(args.db):
-        save_transcription_to_mysql(res_dict, mysql_config, args.session, args.model)
 
-    # If requested, segment the audio and save the segments as WAV files
-    segDF = segment_to_dataframe(res_dict['segments'])
+        print("Transcribing {} with model {}".format(args.path, args.model))
+        res_dict = transcribe_wav(args.path, args.model)
+        print('Transcription Complete. Saving Result...')
 
-    if(args.savepath):
-        segDF.to_csv(os.path.join(args.savepath, 'res.csv'))
-    
-    if(args.segment):
-        segment_audio(segDF, args.path, args.savepath, lead=0, tail=0)
+        # Convert the segments to a DataFrame and save as CSV
+        segDF = segment_to_dataframe(res_dict['segments'])
+        segDF.to_csv(os.path.join(args.savepath, savename + '.csv'))
+
+        # If requested, segment the audio and save the segments as WAV files
+        if(args.segment):
+            segment_audio(segDF, args.path, args.savepath, lead=0, tail=0)
+            
 
 
 
