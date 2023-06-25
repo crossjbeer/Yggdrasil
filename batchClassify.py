@@ -5,6 +5,7 @@ import librosa
 import numpy as np 
 from pathlib import Path 
 import pandas as pd 
+import mysql.connector
 
 from resemblyzer.audio import preprocess_wav 
 from resemblyzer.voice_encoder import VoiceEncoder
@@ -13,13 +14,14 @@ from resemblyzer.voice_encoder import VoiceEncoder
 def make_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--path', help='Pathway to directory with split wav files', required=True)
-    parser.add_argument('-csvp', '--csvpath', help='Pathway to .csv to save classification information', required=True, type=str, default=None)
     parser.add_argument('-n', '--names', help='List of names', nargs='+', required=True)
     parser.add_argument('-sw', '--speakerWav', help='Pathway to speaker sample directory', required=True)
-    #parser.add_argument('-o', '--output', help='Pathway to save directory', required=True)
-    #parser.add_argument('-sl', '--segLen', help='Segment Length for Wav Breakdown (Defaut = 3(mins))', default=3, type=float)
+    parser.add_argument('-u', '--user', help='MySQL user', required=True)
+    parser.add_argument('-pw', '--password', help='MySQL password', required=False)
+    parser.add_argument('-ho', '--host', help='MySQL host', required=True)
+    parser.add_argument('-d', '--database', help='MySQL database', required=True)
+    parser.add_argument('-s', '--session', help='Session ID', required=True)
     return parser
-
 
 def main():
     parser = make_parser()
@@ -27,25 +29,50 @@ def main():
 
     # Get the command-line arguments
     path = args.path
-    csvpath = args.csvpath
     names = args.names
     speakerWav = args.speakerWav
-    #output = args.output
-    #segLen = args.segLen
+    user = args.user
+    password = args.password
+    host = args.host
+    database = args.database
+    session = args.session
+
+
+    try:
+        cnx = mysql.connector.connect(
+            user=user,
+            password=password,
+            host=host,
+            database=database
+        )
+
+        cursor = cnx.cursor()
+    except Exception as e:
+        print("MySQL Connection Failed: [{}]".format(e))
+        exit()
 
     if(not os.path.exists(path)):
         print("Improper Path: {}".format(path))
         exit()
 
-    if(not os.path.exists(csvpath)):
-        print("Improper csvpath: {}".format(csvpath))
+    query = "SELECT start, end, session_id FROM transcript WHERE session = %s"
+    values = (session,)
+
+    try:
+        cursor.execute(query, values)
+
+        # Fetch all the segmentation rows for the specified session ID
+        segmentation_rows = cursor.fetchall()
+    except Exception as e:
+        print("Problem accessing database: [{}]".format(e))
         exit()
 
-    # Get a list of split wav files in the specified directory
-    wav_files = [f for f in os.listdir(path) if re.match(r'split_\d+\.wav', f)]
+    try:
+        fullWav, _ = librosa.load(path, sr=None)
+    except:
+        print("Failed to load wav [{}]...".format(path))
+        exit()
 
-    if(not len(wav_files)):
-        print("No .wav @ {}".format(path))
 
     speaker_wavs = []
     for name in names:
@@ -54,50 +81,43 @@ def main():
     encoder = VoiceEncoder('cpu')
     speaker_embeds = [encoder.embed_utterance(speaker_wav) for speaker_wav in speaker_wavs]
 
-    classificationDict = {}
-    for wf in wav_files:
-        try:
+    for segment_row in segmentation_rows:
+        start_time = segment_row[0]
+        end_time = segment_row[1]
+        id = segment_row[2]
 
-            fpath = os.path.join(path, wf)
-            fullWav, _ = librosa.load(fpath, sr=None)
+        # Segment the WAV file based on the start and end times
+        segmented_wav = fullWav[int(start_time * 16000):int(end_time * 16000)] ## NOTE : FOR STANDARD 16kHz wav | TO DO : Add as Commandline arg
+
+        try:
+            preprocessedWav = preprocess_wav(segmented_wav)
         except:
-            print("Failed to load {}...".format(wf))
+            print("Failed to preprocess the segment...")
             continue
 
         try:
-            preprocessedWav = preprocess_wav(fullWav)
+            _, cont_embeds, _ = encoder.embed_utterance(preprocessedWav, return_partials=True, rate=16)
         except:
-            print("Failed to Preprocess {}".format(wf))
-            continue 
+            print("Failed to embed the segment...")
+            continue
 
-        try:
-            _, cont_embeds, wav_splits = encoder.embed_utterance(preprocessedWav, return_partials=True, rate=16)
-        except:
-            print("Failed to embed {}".format(wf))
-            continue 
-
-        similarity_dict = {name : cont_embeds @ speaker_embed for name, speaker_embed in zip(names, speaker_embeds)}
+        # Perform classification on the segment using the modified code
+        similarity_dict = {name: cont_embeds @ speaker_embed for name, speaker_embed in zip(names, speaker_embeds)}
 
         means = [np.mean(similarity_dict[name]) for name in similarity_dict]
 
         meanMax = np.argmax(means)
         bestName = names[meanMax]
 
-        classificationDict[wf] = bestName 
-        print("[{}] Classifying as {}".format(wf, bestName))
-
-    csv = pd.read_csv(csvpath, header=0, index_col=0)
-    csv.index = range(len(csv))
-
-    keys = list(classificationDict.keys())
-    vals = [classificationDict[k] for k in keys]
-    keys = [int(key.split("_")[1].split(".")[0]) for key in keys]
-
-    newDict = {key - 1 : val for key, val in zip(keys, vals)}
-    newcsv = pd.DataFrame().from_dict(newDict, orient='index')
-
-    csv.insert(4, 'class', newcsv)
-    csv.to_csv(csvpath)
+        try:
+            query = "UPDATE transcript SET class = %s WHERE session_id = %s"
+            values = (bestName, id)
+            cursor.execute(query, values)
+            cnx.commit()
+            print("Classified id {} as {}".format(id, bestName))
+        except Exception as e:
+            print("Unable to update classification for {} ({}, {})".format(session, start_time, end_time))
+            print("Error: {}".format(e))
 
 
 
