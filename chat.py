@@ -3,8 +3,11 @@ import os
 import argparse 
 import pinecone 
 import pandas as pd 
+import numpy as np 
+import mysql.connector
 
 from chatter import Colorcodes, Chatter
+from scripter import Scripter
 
 openai.api_key = os.getenv('OPENAI_AUTH')
 
@@ -24,13 +27,53 @@ def estimateTokens(s, charPerToken = 4):
 
 
 def main():
+    messages = [{'role':'system', 'content':"""You are the Lore Master. You preside over the sacred transcript of a dungeons and dragons campaign.
+                                            Your job is to be the ultimate dnd assistant. The user may ask you any variety of questions related to dungeons and dragons. 
+                                            This can include asking to help build a village, design a character, assist with roleplay, or produce writing materials. 
+
+                                            You will be provided with a section of the transcript related to the question the user has asked. Use this transcript and any 
+                                            background knowledge you may have to answer the user's question as well as you can. 
+
+                                            DO NOT MAKE UP ANYTHING UNLESS SPECIFICALLY ASKED. Use the information provided to answer questions and, if the information is 
+                                            not sufficient, do not resort to making up information. Simply report that no other relevant information was provided.
+                                            
+                                            Here are the speaker codes, names, and character / role:
+                                            <1> cro: Crossland (DM) 
+                                            <2> ric: Richard (Likkvorn)
+                                            <3> let: Leticia (Russet Crow)
+                                            <4> sim: Simon (Lief) 
+                                            <5> ben: Ben (Oskar) 
+                                            <6> kacie: Kacie (Isra).
+                                            """}]
+    
+
     parser = argparse.ArgumentParser()
     parser.add_argument('-q', '--query', help='Query for Chat GPT', type=str, default=None, required=False)
     parser.add_argument('-m', '--model', help='Open AI model to use [gpt3.5-turbo, gpt4]', type=str, default='gpt-4')
-    parser.add_argument('-n', '--nvector', help='Number of vectors to query', type=int, default=25)
-    parser.add_argument('-p', '--path', type=str, help='Path to directory containing <date> folders with embedding files...')
+    parser.add_argument('-n', '--nvector', help='Number of vectors to query', type=int, default=5)
+    parser.add_argument('--host', help='Database host', type=str, default='localhost')
+    parser.add_argument('--user', help='Database user', type=str, default='ygg')
+    parser.add_argument('--db', help='Database name', type=str, default='yggdrasil')
+    parser.add_argument('--password', help='Database password', type=str, default=None)
+
 
     args = parser.parse_args() 
+
+    db_connection = mysql.connector.connect(
+        host=args.host,
+        user=args.user,
+        password=args.password,
+        database=args.db
+    )
+
+    if not db_connection.is_connected():
+        # Close the database connection
+        print(f"{COLORCODE.orange}Cannot connect to MySQL database{COLORCODE.reset}\n")
+
+    else:
+        print(f"{COLORCODE.orange}Connected to MySQL database{COLORCODE.reset}\n")
+        # Create a cursor object
+        cursor = db_connection.cursor()
 
     prompt = args.query
     if(not prompt or not len(prompt)):
@@ -55,89 +98,95 @@ def main():
 
     relatedID = [i['id'] for i in relatedVectors['matches']]
 
-    sessionToID = {}
+    script = Scripter()
+
+    session_bs_index = []
     for id in relatedID:
-        session, _, _, bs, stride, index = id.split("_")
+        session_bs_index.append((id.split('_')[0], int(id.split('_')[3][2:]), int(id.split('_')[5])))
 
-        index = int(index)
+    unique_sessions = np.unique([i[0] for i in session_bs_index])
+    sessionToQuery = {}
+    
+    for s in unique_sessions:
+        indices = [i[2] for i in session_bs_index if i[0] == s]
+        bs      = [i[1] for i in session_bs_index if i[0] == s]
 
-        sessionCode = session + "_" + bs + "_" + stride
+        if(len(indices) == 1):
+            sessionToQuery[s] = [(indices[0], indices[0] + bs[0])]
+            continue
 
-        if(sessionCode in sessionToID): 
-            sessionToID[sessionCode].append(index)
-        else:
-            sessionToID[sessionCode] = [index]
+        bs = [x for _, x in sorted(zip(indices, bs))]
+        indices = sorted(indices)
 
-    sessionToIndexToText = {} 
-    for session in sessionToID:
-        session_date, bs, stride = session.split("_")
+        """
+        querys = []
+        start_ind = None
+        stop_ind = None 
+        for i in range(len(indices)-1):
+            cind, nind = indices[i], indices[i+1]
+            cb, nb = bs[i], bs[i+1]
 
-        sessionToIndexToText[session] = embeddingToText(os.path.join(args.path, session_date, "{}_{}.csv".format(bs, stride)))
-        
+            if(not start_ind):
+                start_ind = cind
 
-    sessionToText = {}
-    for session in sorted(list(sessionToID.keys())):
-        session_date, bs, stride = session.split("_")
+            if(cind + cb <= nind):
+                querys.append((start_ind, cind+cb))
+                stop_ind = None 
+            else:
+                stop_ind = nind + nb
 
-        bs = int(bs[2:])
-        stride = int(stride[3:])
+        if(stop_ind):
+            querys.append((start_ind,))
+        """
 
-        sessionToText[session] = ""
+        querys = [] 
+        i = 0 
+        start_ind = None 
+        while i < len(indices)-1:
+            cind, nind = indices[i], indices[i+1]
+            cb, nb = bs[i], bs[i+1]
 
-        if(len(sessionToID[session]) <= 1):
-            #print("SESSION TO ID: {}".format(sessionToID[session]))
-            sessionToText[session] = sessionToIndexToText[session][sessionToID[session][0]]
-            #print("STT:")
-            #print(sessionToText[session])
+            if(not start_ind):
+                start_ind = cind 
 
-        else:
-            for i in range(len(sessionToID[session])-1):
-                currentInd = sorted(sessionToID[session])[i]
-                nextInd    = sorted(sessionToID[session])[i+1]
+            if(cind + cb <= nind):
+                querys.append((start_ind, cind+cb))
+                start_ind = None 
+                i += 1
+            
+            else:
+                indices[i] = nind
+                bs[i] = nb 
 
-                if(nextInd - currentInd < bs): #If the difference between indices is < the batch, we know there must be (some) overlap, so we should account for that...
-                    howMuchOverlap = nextInd - currentInd
+                indices.pop(1)
+                bs.pop(1)
 
-                    currentText = sessionToIndexToText[session][currentInd]
-                    currentLines = currentText.split("\n")
+        querys.append((start_ind, indices[0] + bs[0]))
+        sessionToQuery[s] = querys
 
-                    sessionToText[session] += "\n".join(currentLines[:howMuchOverlap])
+    allText = ""
+    for session in sessionToQuery:
+        c_query = sessionToQuery[session]
 
-                else:
-                    sessionToText[session] += sessionToIndexToText[session][currentInd] + '\n'
+        for start, end in c_query:
+            print("[{}] Pulling Lines {} -> {}".format(session, start, end))
+            query = "SELECT class, text FROM transcript WHERE session = %s AND session_id > %s AND session_id < %s ORDER BY session_id ASC;"
+            cursor.execute(query, (session, start, end))
 
-            sessionToText[session] += sessionToIndexToText[session][sorted(sessionToID[session])[-1]]
+            rows = cursor.fetchall()
+            row_txt = script.combineRowList(rows)
 
+            allText += '\n' + row_txt
 
-    allText = "\n".join(sessionToText[i] for i in sessionToText)
-
-
-    #print("Querying OpenAI using {} | {} Tokens...".format(args.model, estimateTokens(allText)))
-    """
-    response = openai.ChatCompletion.create(
-        model=args.model,
-        messages = [
-            {'role':'system', 'content':'You are a Dungeons and Dragons AI'},
-            {'role':'user', 'content':'Below is a query provided by the user. You should use the information provided further down to answer this query as well as possible.'},
-            {'role':'user', 'content': args.query},
-            {'role':'user', 'content': 'Below is the context provided. You will see a text transcript of a dungeons and dragons campaign. Each line is labeled with a speaker. Here are the speaker codes, names, and character / role:\n1) cro: Crossland (DM)\n2) let: Leticia (Russet Crow)\n3) ric: Richard (Likkvorn)\n4) sim: Simon (Lief) 5) ben: Ben (Oskar) 6) kacie: Kacie (Isra). Please read through what was said, and help with the query as best you can.'},
-            {'role':'user', 'content':allText}
-        ]
-    )
-    """
+    print()
     messages = [
-            {'role':'system', 'content':'You are a Dungeons and Dragons AI'},
-            {'role':'user', 'content':'Below is a query provided by the user. You should use the information provided further down to answer this query as well as possible.'},
-            #{'role':'user', 'content': args.query},]
-            {'role':'user', 'content':prompt},
-            {'role':'user', 'content': 'Below is the context provided. You will see a text transcript of a dungeons and dragons campaign. Each line is labeled with a speaker. Here are the speaker codes, names, and character / role:\n1) cro: Crossland (DM)\n2) let: Leticia (Russet Crow)\n3) ric: Richard (Likkvorn)\n4) sim: Simon (Lief) 5) ben: Ben (Oskar) 6) kacie: Kacie (Isra). Please read through what was said, and help with the query as best you can.'},
+            {'role':'user', 'content':'Context:'},
+            {'role':'user', 'content':allText},
+            {'role':'user', 'content':'User Query:'}
         ]
     
     chat = Chatter(args.model)
-    chat.chat(allText, True, messages)
-
-    #print("\n\n\n~~~ Chat GPT Says ~~~")
-    #print(response['choices'][0]['message']['content'])
+    chat.chat(prompt, True, messages)
     
 
 if (__name__ == "__main__"):
