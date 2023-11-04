@@ -1,0 +1,259 @@
+Timberhold: 
+
+The Szafirleśny (Wooded Sapphire in Polish)
+
+NPC:
+Chieftain - Har Barkum 
+Dwarf
+367 years old
+Elderly, kindly, but not all there 
+Walks with a limp
+Married into the leadership of Stonegate 
+His clothes are made from the land, including a crocogator leather set, leaf cloak, and a pine-needle crown which he wears as a status symbol. 
+Lives in the chieftain’s house, which doubles as a community meeting spot 
+Bog Watch Leader - Harren Petri
+Dwarf
+200 years old
+Hard nosed and sticks to the rules
+Values upholding the peace above all else 
+Guard stat block with 20 hp and +3 str
+Wears a tanned head of a frog on his own head, as a symbol of his leadership
+Bog Watch Sympathizer - Peakin Landmar
+Dwarf
+60 years old - young
+Sympathizes with the parents of lost children
+Feeds them any information he has on the kids, helps make sure the guards stay off their backs
+Joins family for meetings in The Woodcutter’s Lodge 
+Tadling in the Bog Watchers 
+Guard statblock
+Family 1: The Opalbrows:
+Own the Woodcutter’s Lodge 
+Forulim (Wife)
+Harmben (Husband)
+Polish (Daughter, here) 
+Remy (Son, taken) 
+The opalbrows own the Woodcutter’s Lodge, a popular and well-patronized inn
+This also serves as the meeting place of the small contingent of townspeople interested in figuring out what is going on with the missing children.
+Forulim wears the pants 
+Family 2: The Amberbraids
+Dodraet (Wife) 
+Tukaed (Husband) 
+Thris (Son, taken)
+The Amberbraids are a notable and reasonably wealthy logging family in Timberhold
+Since the fall of Barksbreak, their business has mostly dried up, leaving them with few prospects. 
+However, they still live well and project and air of wealth, due to the vast sum they have saved up
+Family 3: Bens
+Own tavern]
+Father: Orsik
+Mother: Amber
+Town Drunk - Mason Brewson 
+Human
+33 Years Old
+Lays about, sleeps in the stables of The Woodcutter’s Lodge in exchange for managing the horses 
+Also responsible for the firework display 
+Has seen creatures coming and going into the forest
+Apothecary - Sylvia Stonebrow:
+Dwarf 
+177 years old
+Soft spoken, concerned more with plants and concoctions than people
+Can be traded with
+Blacksmith - Ridden Blackhold
+Dwarf
+230 years old
+Mostly makes logging equipment, but has aspirations of building weapons some day
+Part of a long forgotten lineage of dwarves
+From Barksbreak 
+Misc Names: 
+Bofur Ironbeard
+Glimmer Battleaxe
+Krogan Deepforge
+Torgar Thunderfist
+Thoradin Strongbrew
+Gundar Mountainheart
+Durnan Goldhammer
+Fili Steelshield
+Buildings:
+Chieftain’s Mansion
+On a hill overlooking Timberhold 
+Logging buildings
+3 or 4 in town, owned by several different logging families
+The biggest, “The Deeproots” own two of the most used facilities
+Guard Outpost
+One main building down the hill from the mansion
+Several smaller posts peppered around the town’s perimeter 
+Shops:
+Apothecary
+General Store
+Blacksmith / Toolsmith
+Boat repair 
+Tannery
+Bakery 
+Inn: The Woodcutter’s Lodge
+Many homes and small storage locations 
+Temples of Moradinsamman (Dwarven Pantheon): 
+Moradin
+Berronar 
+Thard Harr (god of survival, hunting, and nature.)
+Small Creek - The Lapis Strip 
+The Bog Watch: 
+Leader: Head Toad
+First Tier: Frogs
+Second Tier: froglings 
+Third Tier: Tadlings 
+Dress Details: 
+Swamp rat fur Clothing 
+Crocagator leather
+Feathered hats, feathered adornments 
+Leafy cloaks
+Swamp vine jewelry
+Carnivorous plant dyes
+Mosquito netting
+Mud and clay face paint
+Thorny bramble armor
+Studded leather, where the studs are thorny brambles
+
+Festival of Liren: 
+A festival celebrating Wizard Liren Medowkin (The Crystalline Wizard) 
+An event celebrated by Timberhold and all surrounding small villages
+Popular Features: 
+Games: 
+Archery Competition (Bullseye = Sweet Pie, Bullseye = AC20)
+Apple Bobbing (1cp = 1 attempt) 
+Tree Climbing Race (DC 15 Athletics / Acrobatics)
+The Trial of the Stone (Heavy Stone | DC 22 Athletics) 
+Gem Identification (Int | DC 15 Investigation )
+Eating competition (Con | DC 15 Con St)
+Shows: 
+Jousting
+Stage Play reenacting Nethergloom’s Doom. (See doc)
+Dancing through the streets by performers 
+Music
+Bards walk through crowds singing the praises of Liren
+A small stage set up in the center of town where notable musicians from the area perform: 
+Orinna the Enchantress
+Zara Songbird and the Fiddlers 
+Lady Calliope
+Vendors: 
+Mainly wooden trinkets. Those depicting Liren, his Crystalline Staff, and his fabled Chipmunk companion, Geode
+Food. Candied pinecones. Fruit pies. Sugared hardtack. Jerky. “Forest Stew”. Mushroom Soup and roasted nuts
+Woodworking tools: Saw, axe, chisel, etc
+Clothes
+Commemorative sashes
+Songs about Liren Meadowkin: (ChatGPT 3.5)
+
+
+
+What is happening to the kids: 
+Timberhold: 
+Finley placed the haunted painting at the “Bridgeman’s House” and fortified the home with various tools to make the job of gathering specimens easier 
+Finley gave the painting control over the following creatures: 
+3x homunculus Bullywugs, made mindless 
+2x homunculus crocogators 
+1x homunculus giant toad, which the painting rides upon 
+Finley also gave the painting: 
+A ring of slumber:
+DC 13 Wis ST. On a fail, the wearer is put to sleep for 2d4 hours or until otherwise woken 
+The painting rides the frog from the house and towards timberhold
+There, he finds a kid and incapacitates them with the ring of slumber
+The giant toad scoops the kid into its mouth, and the gang rides back to the house 
+
+
+Chieftain’s Manor
+
+Description: 
+The Timberhold Chieftain’s Manor sits atop a small hill called Meadowkin Ridge, providing a great view of the surrounding area. A winding cobblestone pathway leads up to a waist height, wooden fence surrounding the building. A sturdy stone exterior makes up the first floor, with detailed carvings depicting dwarven folklore set into the heavy granite doorway. The door found within is grand and wooden, well fortified with iron bands and locked. Infrequent windows adorn the second story, but are covered with heavy wooden shutters, creating a sense of impenetrability. 
+A few scattered trees in the premises lend an air of tranquility, but could also serve as a sight-barrier to the patrolling watch. The thinning of the trees on the hill is a clear sign of the degradation of forest lifestyle. 
+Nearby is a stable, a separate small stone structure housing a couple of mountain draft horses and a fancy carriage used by the Chieftain for travel. 
+Behind the mansion, a discreet servant’s entrance can be found, which leads directly to the kitchen.
+Guard Activity: 
+Typically, two at least two guards patrol the mansion grounds, shifting every four hours. 
+One guard typically stands watch at the rear entrance, allowing assorted servants and aids to come and go. This guard watch shifts once every 6 hours. 
+Layout: 
+Entrances: 
+Front Door: 
+The front door is locked at all times, except for town meetings. 
+The bogwatch leader, Harren, keeps a key, as well as Har Barkem himself. 
+Back Door: 
+The backdoor is unlocked, but is constantly guarded by a single guard.
+This door leads into the kitchen, where Har’s chef can be found during daytime hours. 
+This is Har Barkem’s intended escape route
+Cellar Window: 
+A small window is set into the side of base of the building
+This leads into the tiny on-site guards quarters, where a single guard can usually be found sleeping.
+This is a cellar, converted into a living quarter by a paranoid Har. 
+This is accessible through a hatch in the kitchen
+This window is 1ft wide by 4in tall, so not quite big enough for a normal sized humanoid to squeeze through. 
+First Floor: 
+Meeting hall: 
+Right inside the front door is the meeting hall, a large room with a raised platform at the far end where Har sits during celebrations and town meetings. 
+A large table is kept in the center of the room, which serves as a place for townspeople to sit, dinners to be hosted, and more. 
+A grand fireplace is set into one side of the building
+A deer-antler chandelier illuminates the hall 
+A woven forest carpet is set in the floor, projecting an air of wealth and welcoming
+Loot: 
+Deer-antler chandelier - worth about 75gp
+Woven forest carpet - 30gp
+Regal handmade wooden tables, featuring delicate carvings - worth about 150gp each
+Magical adornments: 
+
+
+Kitchen: 
+Set behind the raised platform at the far end of the meeting hall, a door leads into the kitchen
+This fairly impressive room hosts several cooking implements, including a fireplace and large pot, cool locker, various storage locations, spice humidor, and more 
+A door leads into the servant’s hallway
+A hatch leads into the cellar, where casks of wine, liquors, various salted meats, and more can be found 
+Loot: 
+Large pot - worth about 2gp
+Assorted cooking utensils - worth about 1gp each
+Spice humidor - worth about 10gp in spices
+Magical Adornments: 
+Stirring Spoon: A wooden spoon that, when set in a pot, will stir until removed by the user
+Cooling stone: A magical stone enchanted with the ‘frostbite’ cantrip, which keeps any small area cool when placed within. 
+Library: 
+The town library is held opposite the wall with the fireplace
+This holds various maps of the surrounding area, tomes of history about the town, records, receipts, and anything else a library typically holds. 
+Loot: 
+Writing tools and paper - worth about 1gp
+Books - individual books worth about 1gp each, the entire collection could run up to 50gp, but they would likely be identified as stolen, as they all deal with timberhold specifically 
+Second Floor: 
+Har’s Study: 
+Like the Barksbreak Chieftain’s manor, the staircase to the second story leads to Har’s study. 
+Unlike Barksbreak, this study is in pristine condition, and does not belie the wealthy status of this Chieftain
+An intricately carved wooden table sits near one wall, flanked on either side by book cases built into the wall. 
+Crucial maps and artifacts are stored on the shelves
+Curtains of various colors are draped around the windows, a luxury for this part of the world 
+Loot:
+Wooden table - worth about 20gp
+Bookshelves - worth about 10gp each
+Collection of valuable maps - worth about 20gp
+Magical Adornments:
+Silence Bell: This brass bell, when rung, creates a 20ft sphere of complete silence, not a single sound can be heard in it or escape it. Great for conducting confidential talks or keeping library quiet.
+Har’s Bedroom: 
+Clear signs of wealth are found all around. A four-poster bed stands proudly, taking up a significant portion of the space in the room. A grand wardrobe and an exquisite vanity stand, projecting a regal allure. 
+DC 15 Inv Check will reveal a wall-safe hidden behind the vanity. 
+DC 15 lock pick check will open the safe.
+Safe Contents: 
+Explicit letters written between stonegate and Har communicating the extent of their correspondence 
+Har’s personal stash of gold, 25gp in total
+The deed to the royal carriage 
+A small stash of elven wine
+Just like in Barksbreak, maybe they had made similar deals before the city fell to ruin.
+Loot:
+Bed - worth about 60gp
+Wardrobe - worth about 50gp
+Vanity set - worth about 15gp
+Magical Adornments: 
+Har’s Torch: A magical torch enchanted to cast light without burning. No fuel required, but it does not light anything on fire. 
+Balcony: 
+A small balcony provides a sweeping view of Timberhold, looking right down the hill towards the cobble path leading up to the building. 
+This is the main way Empy has been coming / going, escaping in the night during normal times when the guards are not at high alert. 
+Loot: 
+Potted exotic plants and flowers, worth about 5gp each 
+Basement: 
+Cellar: 
+A tiny cellar turned guard-quarter makes up the entire basement of this building. 
+A small cot has been set up along with various storage areas and casks of ale and wine. 
+A tiny rack for weapons is set onto one wall, with a single bow hanging 
+
+
+

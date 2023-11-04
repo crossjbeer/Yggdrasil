@@ -1,0 +1,306 @@
+)
+
+Approaching: 
+The roar of an angry river grows in your ears, subsuming the sounds of the swamp that you have grown accustomed to on your trek. The ground here is deeply saturated, and your feet squelch in the rotten mud, which climbs up your ankles. You push aside the foliage to reveal a single house, built monolithically on the bank of moradin’s sprue, which laps at the foundation.
+
+A thicket of snagroot grows up and around the old bridgeman’s house. The ground wriggles and writhes like a thousand green worms. Any closer and you risk being drug under. You see the decrepit building, now held up by the plants as much as the old stone foundation. You stand huddled 200 ft away. What would you like to do?
+
+Inv 10:
+ Several things stand out: 
+A crude path has been cut to the front door, which has been similarly cleared of snagroot
+Around the corner, a large section of the wall has fallen away, leaving crumbled stone littered amongst the root.
+The flow of moradin’s sprue splashes up and against the house, clearly higher than when the building was created. 
+
+What would you like to do? 
+
+
+The House: 
+Entrances: 
+Front Door
+Challenges: 
+Getting through snagroot
+Signaling fish 
+Signaling Homunculus
+Crocagator (1/20)
+Kitchen:
+Challenges: 
+Snagroot
+Seen by working bullywug
+Seen by crow
+Top Floor: 
+Challenges:
+Snagroot
+Being detected by fish / thrown off
+MOST DANGEOUS 
+Cellar:
+Description:
+You stare down at the roaring waters of Moradin’s Sprue, which have carved away the soil at the river bank
+You will have to grab onto the vines to guide yourself along the side (DC 12 Acrobatics / Athletics)
+IF NO OINTMENT IS APPLIED:
+DC 13 Dex ST for each vine gripped to not get ensnared 
+Growing at the river bank: 
+“Heartleaf” - see “The Swallowed Swamp”
+Can be used to increase the power of spells 
+Small with heartshaped leaves
+If falling into river:
+Give 2 chances to grab onto vines, the second easier than the first, but will have them stuck in the middle of the river for the others to grab
+Unlocking lock
+DC 8 slight of hand check to hold onto key if not wearing ointment
+
+Basement: 
+Descriptions: 
+The air is thick and damp, carrying the smell of rotting wood and stagnant water
+The ground is flooded up to your ankles 
+The walls and wooden ceiling above are covered with molds of various colors 
+The only light comes from a few small cracks in the floor boards above
+A strong, rancid fishy scent wafts through the air, mixing with the mold and stagnant water 
+Features: 
+Old fish-tanks with kids inside
+Sannil
+Missing Amberbraid boy (unconscious) (Thris)
+Hidden loose floor board: 
+Leads up into the study 
+DC 16 Inv
+Crumbled fireplace:
+DC 16 Str to clear rubble 
+Leads into study 
+Loot: 
+Boxes of old kid stuff: 
+Tattered clothes 
+A small wooden doll 
+Food scraps
+A loose stone against the wall (DC 20 INV):
+Bracelet of shape water
+Fly-making table
+3 old fancifully made flies 
+Box of fly-making materials (1gp)
+Net, old and tattered 
+Door to first floor: 
+Locked from other side with dead bolt 
+A thin light shines in between the floor and door
+A throaty warbling can be heard coming from somewhere to the left, where a bullywug is encasing a young boy in a slime
+
+First Floor: 
+Study:
+The Singing Fish: 
+A Crystalline Trout (uncommon fish prized for beautiful, crystal-like scales) is mounted on the wall with a small pink crystal. 
+The crystal is a trick to get the players to approach, and the fish will start singing without the crystal pressed
+On a DC13 perception check, the players will see the fish’s eyes moving around, intelligently looking for something 
+Once the fish sings, the fish sings a parody of the liren’s song: 
+In the heart of the river, so murky and brown 
+Liren Meadowkin was surely drowned
+With water too deep for him to stand
+and no one there to grab his hand 
+Liren meadowkin, the wizard of bore
+His crystal magic is such a snore
+A hero to no one a pain to us all 
+Against Nethergloom he fell and crawl. 
+His spells are weak, his wand so frail
+He thinks he’s mightly, but he will fail
+His adventures mundane, his stories old
+Hes nothing special, just a wizard, so cold 
+When hearing this, the players in ear-shot must make a DC 13 Wis ST. On a fail, a magic fish hook will pierce their cheek,and they are under the effect of Mulgogi’s ‘slow’ spell
+Small library of fishing books: 
+“The Complete Angler” by Izaak Walton (Description of fishing tactics) (1sp)
+“A River Runs Through It” By Norman Maclean (an emotional tale of a man deciding if his love is a woman or the sea) (2sp)
+“The Fisherman’s Bedside Book” (beautiful pictures of local fish and their description) (3sp)
+DC 18 INV: “The Art of Fly Making” - rare (5gp)
+In the desk: 
+A drawer with an old map, and a marking showing “fishing stash” down the river
+FISHING STASH: 
+Great fishing rod location down the river
+“Mystic fishing pole”
+Buried in fast-moving moradin’s sprue flow
+Kitchen: 
+Descriptions: 
+Slimy, grease caked vines web up the wall
+They are pale in color, with a papery, falkey quality
+Pots and pans are scattered around the room, similarly covered in the webbing. Some contain rotting, mold and fungus covered food still inside 
+Any cabinets left are full of moldy bread, spoiled fruit, and clear signs of disuse 
+Cobwebs hang from the ceiling where vines haven’t already grown
+Bullywug:
+Two bullywug homunculus work in the kitchen, preparing the boy for transportl. 
+If alerted, one will run out the hole in the wall and the other will run up the stairs to alert the fish 
+The one running out the hole in the wall and hiding outside the house, to trap the players when they climb the ladder
+The one running upstairs is going to alert Mulgogi, and locks the door behind him
+Pots on the fire:
+There is a boiling pot of crawfish which both the bullywug and the children eat
+Claw traps:
+These are manipulated by Mulgogi as a trap, shooting from various pots at the players as they pass
+3x traps 
+DC 14 Dex ST or take 1d4 claw damage 
+Bedroom 
+Description:
+An acrid, familiar smell emits from behind the door before you even open.
+The handle, door, and space between the door and floor are sticky with slightly acidic frog goo
+When opening, a sludge of slime sloughs onto the floor, no longer held by the door.
+The room is a frog’s nest, created by piling nets, blankets, furniture and more with channels dug in to create a space for the frog and bullywug
+DC 12 perception check: 
+The players will notice common, clearly written high up on the wall where the goo hasn’t caked
+The common reads “hector” in increasingly misspelled and disheveled handwriting 
+This is the name of the bullywug which was grafted onto the body of a large swamp frog, who was trying to retain person hood 
+If the players speak this name to the frog, it will turn on Mulgogi and attack the painting 
+DC 15 inv check + DC 13 con check for acid: 
+A tarnished silver ring (2sp)
+A handful of brightly colored glass beads
+The goo-covered leather bound journal (singed and broken) of the bridgeman “journal of yorim brim, bridgeman” 
+SEE RECORDING FOR JOURNAL ENTRY
+Second Floor:
+Prize Room
+Descriptions: 
+You enter a once lavishly decorated, fish themed room. 
+A leather couch sits rotting in the corner, sat across from an old fireplace
+Where the walls aren’t covered with moss and rotting wood, three stuffed fish like the one downstairs sit, each with a pink crystal
+CLICK!
+The latch you came in through clicks locked, and a thick warbling is heard from the other side
+The hatch is locked: 
+Lockpicking: DC 22 
+Smash: DC 14
+The fish on the wall chime up, slowly at first, letting out little giggles the players can see pulse from their twitching gills
+Finally they break into laughter and proclaim that they are trapped
+The players will notice snagroot creeping in from the open window, 
+The fish will exclaim the key is gone and they will make the snagroot come and tangle them all up!
+Finding the key:
+DC 13 inv check looking out the window
+See the key snagged on a root, which is far but climbing towards the open window
+The players must allow the snagroot to fill ½ the room to get the key
+Smashing the door:
+DC 17 Str check
+DC 18 lock pick
+Back hallway to bedroom:
+Description:
+A torrent of water shoots from the door as you enter
+Water rushes past your ankles, making it difficult to move through the hallway which lies ahead 
+A rotted plaque hangs by one chain in the center of the hallway, reading “The Family”
+The walls are lined with at least 8 fishing rods, each controlled by Mulgogi
+Fishing Rod:
++3 to hit, 1d4+1 dmg, subtracts 5 ft from player movement until removed as a bonus action
+Bedroom:
+Description:
+You push past the growing force of water pressing up against you and round the corner, revealing a bedroom.
+Near the other side of the room, hovering in the air, a sight more fearful than anything you have come across on your short adventure together. A visage, painted on canvas and enframed wood strikes fear into your heart. The source of this house’s sinister evil to be sure (show painting)
+MULGOGI
+Otherwise this was once a bedroom, with ragged woolen sheets matted with dirt and rot
+Creatures in the room:
+1x Giant Frog Homunculus, named hector
+1x bullywug homunculus 
+Mulgogi painting
+What’s mulgogi doing:
+Holding the staff of create water, which will crack when the players get their first hit on Mulgogi 
+Throwing objects at the players as they approach 
+Fight Progression: 
+Mulgogi FIrst Hit:
+Water staff breaks
+Mulgogi second hit:
+Telekinesis to rumble the house, creating a fissure in the middle of the room
+
+
+Behind Mulgogi:
+The outline of a fish stand, with no fish. When the 
+Rewards: 
+Basement:
+Bracelet of shape water, requires attunement
+Net
+Fly making kit
+First Floor:
+Crystalline Trout
+“The art of fly making”
+“Fishing stash” location 
+Second Floor:
+3x rare fish
+Staff of create water
+Necklace of unseen servant 
+
+
+
+
+— Stat Blocks  — 
+
+Mulgogi: 
+Painting of a fish
+AC 12 Crystal Heart
+HP: 
+Speed: 0
+Str: 0
+Dex: 0
+Con: 13 (+1)
+Int: 18 (+4)
+Wis: 10
+Cha: 7 (-2)
+Arcana +6, Inv +6, History +6
+Senses: Darkvision 100 ft
+Langs: common, sylvan, infernal 
+Damage Resistances: Necrotic, Psychic
+Damage Immunities: Poison
+Condition Immunities: Charmed, Exhaustion, Frightened, Poisoned
+Abilities:
+Ethereal Sight: See 60 ft into the Ethereal Plane
+Telekinesis: 
+The painting can use telekinesis powers through the crystal in its wood. It can cast mage hand as an action. It can cast telekinesis 2x / day. 
+Possession: 
+As an action, target a creature. Creature makes DC 13 Wis ST or be possessed. While possessed the target will begin to flop like a fish on the ground, incapacitating them until the start of their next turn. 
+Staff of Create Water:
+A staff given by Lord Nethergloom. Shoots a jet of water, but breaks at the end of the fight.
+Once broken, the staff can cast create water 2x / day. 
+DC 13 Spell Save DC
+Spells:
+1) Slow (speed halved, -2 to dex saves, lasts 15 mins @ expense of removing other benefits)
+2) Silent Image
+3) Cause Fear
+4) 
+
+Homunculus Bullywugs:
+Medium Humanoid
+AC: 10 (tough skin)
+HP: 15
+Speed: 30ft, swim 30ft
+
+Resistances to Poison 
+Acrobatics +3, Stealth +3
+Senses: Darkvision 60ft, 
+Langs: bullywug, abyssal 
+Amphibious: Corruptd bulllywug can breath air and water
+Corrupted Nature:
+The dark forces binding the creature give it resistance to necrotic damage and vulnerability to radiant damage 
+Actions:
+Bite: +4 to hit, reach 5ft, one tgt, hit: 6(1d8+2) piercing dmg
+Claws: +4 to hit, reach 5ft, one tgt, hit: (1d4+2) slashing dmg 
+Corrupted Ooze: 
+On a successful claw hit, DC 8 Con save. On fail, take 1d6 necrotic dmg o rnone on a success
+
+
+Crocagator	
+Large monstrosity, unaligned	
+Armor Class	14 (natural armor)
+Hit Points	90 (17d10+34)
+Speed	30 ft., swim 40 ft.
+STR	19 (+4)
+DEX	12 (+1)
+ CON	14 (+2)
+INT	2 (-4)
+WIS	10 (+0)
+CHA	5 (-3)
+
+
+Skills	Stealth +3
+Senses	passive Perception 10
+
+Challenge	5 (1,800 XP)
+
+Hold Breath.	The crocagator can hold its breath for 30 minutes.
+Multiattack.	The crocagator makes two attacks: one with its bite and one with its tail.
+Bite.	Melee Weapon Attack: +7 to hit, reach 5 ft., one target. Hit: 15 (2d10+4) piercing damage. If the target is a creature, it is grappled (escape DC 14). Until this grapple ends, the target is restrained, and the crocagator can't bite another target.
+Tail.	Melee Weapon Attack: +7 to hit, reach 10 ft., one target. Hit: 11 (2d6+4) bludgeoning damage.
+
+
+Mother Frog: 
+	The mother frog has AC 13 | 30 HP | 30 Speed 
+	Breath Weapon: DC 12 Dex Save | 20/80 | (1d10 + 3 Acid Damage) | Recharges on ⅛ 
+Basic Frog: 
+	Basic Frog doesn’t have access to the swallow attack 
+	Basic Frog HP: 12
+	Basic Frog AC: 10
+	Basic Frog STR: +1
+	Basic Frog Dex: +2
+sadfa
+
