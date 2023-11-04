@@ -4,7 +4,8 @@ import os
 import json
 import soundfile as sf
 import pandas as pd
-import mysql.connector
+#import mysql.connector
+import psycopg2
 import datetime as dt
 
 def make_parser():
@@ -21,6 +22,7 @@ def make_parser():
     parser.add_argument('--table', help='Table with transcript', default='transcript')
     parser.add_argument('--session', help='Session name', required=False)
     parser.add_argument('--lang', default='en', help='Language to Transcribe', required=False)
+    parser.add_argument('--session_name', default='', help='Name for the session. Can just be the date or anything else descriptive.', required=False)
 
     return(parser)
 
@@ -79,7 +81,7 @@ def segment_audio(segDF, wav, savepath, lead=0, tail=0):
         except Exception as e:
             raise ValueError(f"Failed to save segment {i+1} as a WAV file.") from e
 
-def save_transcription_to_mysql(res_dict, mysql_config, table, session, whispermodel):
+def save_transcription_to_mysql(res_dict, mysql_config, table, session, whispermodel, session_name):
     segments = res_dict['segments']
 
     try:
@@ -98,9 +100,9 @@ def save_transcription_to_mysql(res_dict, mysql_config, table, session, whisperm
         now = dt.datetime.now()
         session_id = i+1
 
-        insert_query = "INSERT INTO " + table + " (session_id, session, whisper, text, start, end, upload) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        insert_query = "INSERT INTO " + table + " (session_id, session, whisper, text, start, stop, upload, session_name) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
 
-        cursor.execute(insert_query, (session_id, session, whispermodel, text, start, end, now))
+        cursor.execute(insert_query, (session_id, session, whispermodel, text, start, end, now, session_name))
 
     if(sql):
         connection.commit()
@@ -109,6 +111,40 @@ def save_transcription_to_mysql(res_dict, mysql_config, table, session, whisperm
         # Close the cursor and connection
         cursor.close()
         connection.close()
+    else:
+        print("Problem saving to MySQL")
+
+    return()
+
+def save_transcription_to_postgres(res_dict, postgres_config, table, session, whispermodel, session_name):
+    segments = res_dict['segments']
+
+    try:
+        connection = psycopg2.connect(**postgres_config)
+        cursor = connection.cursor()
+    except Exception as e:
+        print("Unable to connect to PostgreSQL.")
+        print(e)
+        return
+
+    for i, segment in enumerate(segments):
+        start = segment['start']
+        end = segment['end']
+        text = segment['text']
+        now = dt.datetime.now()
+        session_id = i+1
+
+        insert_query = "INSERT INTO " + table + " (session_id, session, whisper, text, start, stop, upload, session_name) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+
+        cursor.execute(insert_query, (session_id, session, whispermodel, text, start, end, now, session_name))
+
+    connection.commit()
+    print("Transcription data saved to PostgreSQL.")
+
+    cursor.close()
+    connection.close()
+
+    return()
 
 def main():
     parser = make_parser()
@@ -130,7 +166,7 @@ def main():
                 print("Unable to build save path [{}]...{}".format(args.savepath, e))
                 exit()
 
-    mysql_config = {
+    db_config = {
         'host': args.host,
         'database': args.db,
         'user': args.user,
@@ -147,7 +183,8 @@ def main():
 
     # Save the transcription to MySQL
     if args.db:
-        save_transcription_to_mysql(res_dict, mysql_config, args.table, args.session, args.model)
+        #save_transcription_to_mysql(res_dict, mysql_config, args.table, args.session, args.model, args.session_name)
+        save_transcription_to_postgres(res_dict, db_config, args.table, args.session, args.model, args.session_name)
 
     # If requested, segment the audio and save the segments as WAV files
     segDF = segment_to_dataframe(res_dict['segments'])
@@ -163,3 +200,7 @@ if __name__ == '__main__':
     main() 
 
     #main(args)
+
+
+
+

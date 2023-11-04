@@ -86,7 +86,8 @@ def combine_wav_files(files, save_path):
 
 def delete_wav_files(wav_files):
     for file in wav_files:
-        os.remove(file)
+        if(os.path.exists(file)):
+            os.remove(file)
 
 def main(path, savepath, savename):
     """
@@ -136,7 +137,13 @@ def main(path, savepath, savename):
         print("No WAV files generated. Exiting.")
         return
 
-    combine_wav_files(wav_files, os.path.join(savepath, savename + '.wav'))
+    #input()
+    print(wav_files)
+    if(len(wav_files)>1):
+        combine_wav_files(wav_files, os.path.join(savepath, savename + '.wav'))
+    else:
+        print("SAVING AS: {}".format(os.path.join(savepath, savename+'.wav')))
+        os.rename(wav_files[0], os.path.join(savepath, savename+'.wav'))
 
     delete_wav_files(wav_files)
 
