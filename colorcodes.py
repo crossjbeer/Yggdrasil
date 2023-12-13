@@ -48,6 +48,6 @@ class Colorcodes(object):
         return(f"{self.red}{s}{self.reset}")
 
     def pbold(self, s):
-        return(f"{self.bolf}{s}{self.reset}")
+        return(f"{self.bold}{s}{self.reset}")
 
     

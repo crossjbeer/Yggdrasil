@@ -19,9 +19,6 @@ def make_parser():
     parser.add_argument("-s", '--session', type=str, help='Session Code', default=None, required=False)
     parser.add_argument('-sn', '--session_name', type=str, help='Session Name', default=None)
     parser.add_argument('-wm', '--whispermodel', help='Name of the whisper model used to transcribe (for session id)', default='base.en', type=str)
-    
-    #parser.add_argument('-bs', '--batchsize', type=int, help='Batch size for text ingestion', default=5)
-    #parser.add_argument('-st', '--stride', type=int, help='Number of rows to progress with each new batch', default=1)
 
     parser.add_argument('-p', '--pinecone', help='Upload vectors to pinecone db', action='store_true')
     parser.add_argument('-pi', '--pinecone_index', help='Index for Vectors', type=str, default='yggy')

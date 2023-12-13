@@ -15,31 +15,9 @@ pinecone.init(api_key = os.getenv('PINECONE_AUTH'), environment='asia-southeast1
 INDEX = pinecone.Index('yggy')
 COLORCODE = Colorcodes() 
 
+from tokenizer import Tokenizer
 
-
-def main():
-    messages = [{'role':'system', 'content':"""You are the Lore Master. You preside over the sacred transcript of a dungeons and dragons campaign.
-        Your job is to be the ultimate dnd assistant. The user may ask you any variety of questions related to dungeons and dragons. 
-        This can include asking to help build a village, design a character, assist with roleplay, or produce writing materials. 
-
-        You will be provided with a section of the transcript related to the question the user has asked. Use this transcript and any 
-        background knowledge you may have to answer the user's question as well as you can. 
-
-        DO NOT MAKE UP ANYTHING UNLESS SPECIFICALLY ASKED. Use the information provided to answer questions and, if the information is 
-        not sufficient, do not resort to making up information. Simply report that no other relevant information was provided.
-                 
-        Be sure to answer in at least a few paragraphs. Be thorough and give the user the specific detail they are interested in. 
-        
-        Here are the speaker codes and characters / roles:
-        <1> DM
-        <2> Likkvorn
-        <3> Russet Crow
-        <4> Lief
-        <5> Oskar
-        <6> Isra
-        """}]
-    
-
+def make_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('-q', '--query', help='Query for Chat GPT', type=str, default=None, required=False)
     parser.add_argument('-m', '--model', help='Open AI model to use [gpt3.5-turbo, gpt4]', type=str, default='gpt-4')
@@ -51,16 +29,31 @@ def main():
     parser.add_argument('--table', help='Table with Transcriptions', default='transcript', type=str)
     parser.add_argument('--stopwords', help='Eliminate stopwords from transcript', action='store_true')
 
+    return(parser)
 
+
+def main():
+    messages = [{'role':'system', 'content':"""You are the Lore Master. You preside over the sacred DM notes of a Dungeons and Dragons Campaign.
+        A group of friends spend time and laugh together because of this, and it is of great importance. 
+        Your job is to be the ultimate dnd assistant.
+        To help in your job, you are given chunks of notes relevant to your campaign. Use these notes to answer the user's question to the best of your ability. 
+        Remember, these notes are sacred and should be adheared to. 
+        Be thorough and give the user the specific detail they are interested in. 
+        
+        Here are the speaker codes and characters / roles:
+        <1> DM
+        <2> Likkvorn
+        <3> Russet Crow
+        <4> Lief
+        <5> Oskar
+        """}]
+
+    parser = make_parser()
     args = parser.parse_args() 
 
+    tizer = Tokenizer(args.model)
 
     script = Scripter()
-    #script.connectMySQL(args.host, args.db, args.user, args.password)
-
-    #if(not script.connection.is_connected()):
-    #    print(f"{COLORCODE.orange}Cannot connect to MySQL database{COLORCODE.reset}\n")
-    #    exit()
 
     prompt = args.query
     if(not prompt or not len(prompt)):
@@ -89,18 +82,11 @@ def main():
     id = [] 
     batchsize = [] 
     for rid in relatedID:
-        print("ID {}".format(rid))
-
-
-        #fn, sid, bs = rid.split("_")
         fn, details = rid.split(']')
         fn = fn[1:]
 
-        #split = rid.split(']')
-        #print(split)
         _, sid, bs = details.split('_')
 
-        #filename.append(fn[1:-1])
         filename.append(fn)
         id.append(int(sid))
         batchsize.append(int(bs))
@@ -135,18 +121,30 @@ def main():
         noteToInterval[s] = merged_intervals
 
     allText = ""
+    overall_tokens = 0 
     for note in noteToInterval:
+        print("Loading note: [{}]".format(note))
         allText += "***\n{}\n***\n".format(note)
 
         c_script = Scripter()
         c_df = c_script.loadTxt('./notes/{}.txt'.format(note))
 
+        all_tokens = 0 
         for start, end in noteToInterval[note]:
             c_str = c_script.getStrRows(c_df, start, end-start)
             allText += "\n".join(c_str) + "\n"
 
+            tokens = tizer.calculate_tokens("\n".join(c_str))
+            all_tokens += tokens 
+            print("  - Lines {} -> {} ({} Tokens)".format(start, end, tokens))
+        print("[{}] Tokens: {}".format(note, all_tokens))
+        overall_tokens += all_tokens
+
+    print("All tokens added: {}".format(overall_tokens))
+
+
     allText += """Above you see snippets from various notes related to this campaign.
-Each new note will be predicated by:
+Each new note is predicated by:
 ***
 <Note Name>
 ***
@@ -162,10 +160,7 @@ Please Use this information as context for the user query\n\n.
     
     chat = Chatter(args.model)
 
-    #chat.printMessages(messages)
-    #input()
-
-    chat.chat(prompt, True, messages)
+    chat.chat_db(prompt, True, messages)
     
 
 if (__name__ == "__main__"):

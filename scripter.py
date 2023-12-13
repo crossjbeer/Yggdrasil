@@ -324,8 +324,6 @@ class Scripter:
                 str_rows = self.filterFillerLines()
 
             c_cost = self.calcTokens("\n".join(str_rows))
-            #print(c_cost)
-        #input()
 
         return(bs)
     
