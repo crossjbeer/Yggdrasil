@@ -502,5 +502,185 @@ We don’t deserve leaders who shy away from their responsibilities. We deserve 
 Remember, we are not helpless; we are a community. Together, we are unstoppable. We will reclaim our village, our homes, and our lives. Whatever it takes to keep our children safe and our town thriving. This is our charge, our mission. And it starts right here, today, with us!"
 
 
+Leaving Timberhold: 
+The players broke into Har’s manor and charmed him and his guard. 
+The players learned about Har’s involvement with stonegate. 
+They either believe he is liable due to his dementia, his letters aren’t making it to stonegate, or the conspiracy goes all the way to the top
+Ultimately, they do not believe har is fit to rule. 
+They have given his unsent letter, demanding assistance and an end to their gift-giving relationship, to Forulim
+When the players leave the following will happen: 
+Harren will be fired as Head Toad of the bog watch. Har can’t believe that the party could invade his space under his watch, and he no longer feels Harren is fit to lead. 
+Peakin Landmar will gain ranks, as he seemingly is a respected member of the bog watch
+Forulim, using the letter, will continue to galvanize the people of timberhold and will even turn Harren to their cause. 
+NOTE: This should incentivize the players, upon return, to remove Har from leadership 
+
+Sneaking out of Town: 
+With Har’s charm worn off and the guards on the look for the party, it is a challenge to get out of town. 
+As the players head out, have them roll a DC 12 history check. On a success, they know the approximate location of the garage. 
+The players will make their way out of town in segments. There are 10 segments to go through. 
+Before the players start their journey, have the players make a group stealth check. Anything above 10 is a success. 
+Each segment, roll a d8. On a 1 through 2+number of successes, nothing happens. Otherwise roll on the table below for an event. 
+Some rolls have fail conditions. If 3 such conditions are met, then the guards will notice the players and initiative will roll. 
+
+LEAVING TIMBERHOLD ROLL TABLE: 
+1. The party is spotted by a group of town teens who recognize them. They eagerly approach, asking for autographs and wanting to hear tales of their adventures. The players can choose to engage with them or try to slip away unnoticed.
+
+2. A guard dog barks loudly from a nearby backyard, drawing the attention of the guards. The players must quickly find a way to distract or calm the dog to avoid being discovered.
+
+3. A guard is patrolling the path ahead, walking towards the party. The players must find a hiding spot or come up with a clever disguise to avoid being recognized.
+
+4. As the players turn a corner, they come across a group of townspeople who are sympathetic to their cause. They offer to create a diversion by staging a fight to distract the guards. The players can choose to take advantage of this opportunity or proceed cautiously.
+
+5. The party accidentally sets off a noisy trap, causing a commotion and alerting the guards. They must think quickly to either disarm or bypass the trap before they are caught.
+
+6. A loud crash is heard nearby as a cart overturns, spilling its contents all over the street. The players can help the merchant who owns the cart, causing a distraction in the process, or use the chaos to slip away unnoticed.
+
+7. A friendly shopkeeper offers the players a hiding spot in their storage room until the guards pass by. The players must navigate through the cramped and cluttered room without causing any damage or making noise.
+
+8. A stray cat starts following the party, meowing loudly and attracting unwanted attention. The players must find a way to either shoo away the cat or keep it quiet to avoid being discovered.
+
+9. The players come across a street performer putting on a show. They can choose to watch the performance and blend in with the crowd or use it as a distraction to slip away unnoticed.
+
+10. A vendor selling fruits and vegetables accidentally drops their entire basket, causing the produce to scatter across the road. The players can help gather the scattered items, keeping a low profile, or use the chaos to their advantage.
+
+11. The party encounters a group of children playing a game of hide-and-seek. They plead with the players to help them find the last hider before the guards catch them. The players can choose to assist, causing a distraction, or continue on their way.
+
+12. As the players approach a crossroad, they notice a friendly beggar who recognizes them and asks for change. If angered, the beggar will alert the guards. 
+
+Acquiring the Royal Carriage: 
+Details: 
+The carriage is stored in the Royal Garage at the South East corner of Timberhold. 
+The carriage must be manned by 2 horses and a driver due to its size and opulence. 
+Charisma Route: 
+The players must manipulate the one guard on duty into letting them have the carriage. 
+Stealth Route: 
+The players could enter through the back, as this is not a well-guarded facility. 
+Combat Route: 
+If the players fight, the guard is a dnd 5e guard 
+Distraction 
+etc
+
+
+Royal Timberhold Carriage: 
+
+CARRIAGE HP: 150 -> 146 -> 150 -> 
+
+Traveling to Marthommar: 
+The foundation of the province is shaking for the first time in centuries. Roads walked safely for years are now unsafe, beset by all matters arcane and mundane. As the players travel, each day roll a D3. On a 1, roll on the random event table below. 
+
+1. Bandit Ambush:
+As your party meanders down the South road out of Timberhold, the pristine silence of the woods is abruptly interrupted. A loud, unceremonious burp echoes through the fog ahead, followed by stifled guffaws. A gangly, visibly intoxicated gnome leaps out from behind a nearby clump of overgrown vines and thorns.
+
+"Corny’s the name!" The gnome slurs, comically brandishing a sword, "And I’m demandin' ya cough all your shinies! Or else!" Three additional figures lie in wait. A DC 12 (Perception) check reveals the ambush. A DC 14 (Insight) check reveals that Corny is faking his intoxication. 
+
+Challenge: Defeat the bandit ambush and protect the royal carriage.
+DC: 12 (Perception) to detect the ambush.
+Loot: Each bandit carries a pouch containing 5-10 gp.
+
+
+
+
+
+
+
+
+
+
+2. Wandering Merchant: 
+​​A friendly and chatty dragonborn wandering merchant named Magros Goldenscale has set up a small roadside stall between Timberhold and Marthommar. Magros, larger than most of his kind, has a radiant golden scale color that can be spotted from a distance. His stall, a makeshift setup from his rather substantial caravan, is stocked with various goods. He offers food, supplies, and minor equipment at fair prices; his homemade dried meadfruit jerky is particularly well-regarded.
+
+Magros, with his jovial demeanor and hearty laugh, might well have useful information about the road ahead, given his frequent travels. He is also known to have connections in Marthommar and might be a valuable source of rumors or inside knowledge about the city.
+
+Knowledge: 
+The University at Marthommar is known to practice and encourage deep magic, making it a place of high academic and magical significance.
+
+
+
+Connections: 
+Aluriel Silvertome - Head Librarian at the university, an old family friend. They send rare tomes and books to each other.
+(Found for DC 15 persuasion) Tanzor Quickfingers - A notorious guild thief who owes Magros a favor. This connection may be useful for hard-to-get items or under-the-radar inquiries. 
+
+Inventory: 
+1. Homemade Dried Meadfruit Jerky (1gp/packet)
+2. Healing Potions (Minor - 15gp, Regular - 50gp)
+3. Adventure Rations (5gp/day set)
+4. Basic Armor (Leather Armors – 10gp, Chainmail - 75gp)
+5. Weapons (Dagger - 2gp, Shortsword - 10gp, Longsword - 15gp)
+6. Rope (1gp/50ft)
+7. Grappling Hooks (2gp each)
+8. Arrows (1gp for a bundle of 20)
+9. Ornate Trinket Box (20gp each)
+10. Local Brew - "Dragon's Breath" Fire Ale (5gp/bottle)
+
+3) Mysterious Fog: 
+As you walk, a diffuse mist begins to condense. Looking ahead, you can see the fog grows thicker. As you move, your vision grows further obscured, until you can see only 5ft in front of you. On a DC 12 survival check, you notice that the fog grows more thick off the path, into the woods. 
+
+If the players pursue this fact, they will need to pass a DC15 survival check to successfully traverse the fog. Upon a success, the players find a chest, emanating a thick fog. The players must make a DC 15 arcana check or a DC 18 lockpick check to open the chest. Inside they find: 
+Chest Contents: 
+One ring of spell storing:
+At the start of each day, the wearer may select one of their prepared spells to load in the ring. They may choose to cast this spell, without spending a slot, sometime that day. 
+Gold Pouch: 
+Small pouch containing 15GP
+Dried Alchemical Supplies: 
+3 Swamproot
+1 Swamp Willow 
+3 flutter resin 
+Hat of Disguise: 
+A hat, requiring attunement
+A loud, feathered pirate hat
+Allows the wearer to cast disguise self at will
+The disguise must include said loud, feathered pirate hat 
+4) Fellwild Beasts:
+After mounting a rocky outcrop along the path, a trio of direwolves leap out onto the path. The three, lead by the Alpha, cut off the path, snarling. A DC 13 Nature check reveals that the wolves are starving and malnourished. The alpha is a Chilled Dire wolf, with a small sapphire crystal growing from its chest. This wolf can cast ray of frost at will and has 10 extra HP. 
+With a DC 14 animal handling check, the players can feed each wolf a day’s rations. With a DC 18 animal handling check, they can realize that it is insufficient to appease the alpha, who requires 2. 
+With a DC 19 Animal Handling check, or speak with animals, the alpha will reveal that they are struggling to feed themselves due to the appearance of a Noosebloom in their section of the forest.
+
+
+
+ 
+The Forest Noosebloom: 
+An aberrant noosebloom grows from a rocky cliff face, blocking the entrance to what clearly appears to be a cave or wolf den. Snagroot grow radially from the large pitcherplant like flower, twitching at any sound nearby. A small bird can be seen writhing amongst the vines. One noosebloom has been seen so far, and this one is clearly different, as if the lineage is evolving. 
+Lit most at the base, the noosebloom cackles with energy. With a DC 15 nature or arcana check, the players reveal that the noosebloom has been electrically charged, imbuing the snagroot with the ability to cast chromatic orb, lightning variant. This will be treated like a breath weapon and recharge on a 5 or 6. 
+
+5. Roadside Shrine: 
+Nestled under a cluster of ancient timberwood trees, an intricately handcrafted shrine greets the party's eyes. This sacred edifice is dedicated to Berronar, the revered goddess worshipped locally for her gifts of fertility and protection. It is apparent through the shrine's distinct design- a rich fusion of Tree Gnome and Dwarfish craftsmanship, that both races hold this deity in great esteem.
+Challenge: Engage with the shrine, seeking its blessings and/or historical revelations.
+DC: 12 (Religion/History) Draw upon your historical and theological knowledge
+Loot: The Divine Abode of Berronar blesses the party with a boon. Such divine intervention grants a temporary empowerment: advantage on the next skill check or saving throw performed by each party member. This may prove instrumental in the impending challenges that lurk in the haunted house and Swallowed Swamp.
+The players also notice a small collection area, with 5s 1g in a bowl. 
+Keeping watch over the shrine's sanctity is Eloen, a paternalistic old Dwarf who is the self-proclaimed "Steward of Berronar's Abode". Sporting a greying beard and carrying a staff etched with mystical symbols, he comes across as stern at first impression. However, this demeanor often softens as he hears travelers' tales, shares his homebrewed ale, and offers cryptic words of guidance to those who pay homage to the goddess.
+
+6. Traveler in Need:
+You come across a wounded adventurer desperately trying to evade pursuers. The pursuers, mentioned in roll (1), are closing in on the traveler. They are a group of thieves, but they have, in turn, been stollen from by the adventurer, Tomlin Scoots, a drawvish rogue. 
+
+Challenge: Defeat the goblin assassins and offer aid to the wounded traveler.
+DC: 15 (Perception) to notice the approaching assassins in time.
+Loot: The wounded traveler offers a small but valuable magical trinket, A Robe of Useful Items, as a token of gratitude. 
+
+If the players give up the traveler, the thieves will offer 1 scroll of bless and 5gp. 
+
+Required Marthommar Travel Event: 
+Setup: 
+On day 3 of the party’s travels, they will hear cries coming from deep in the woods. 
+A gnome is found in the middle of his consumption at the behest of a gelatinous cube
+As his shoes and pants begin to sizzle, another gnome, a woman, tries desperately to free the trapped gnome. 
+The trapped gnome, however, does not wish to be freed and fights to succumb. 
+The male gnome is a failed inventor, who wishes to create gelatinous cube removed of its acidic properties
+This would allow someone to use a cube as a storage medium, food preservation device, etc
+It also has practical methods, as a cube un-acidified could be imbued with other properties 
+The gnome has been unable to perfect his device and, as a result, has nothing to bring to Marthommar’s Endless Faire. 
+Character: 
+Male Gnome: Sir Glimmer Geargrind
+Female Gnome: Mistress Bella Geargrind 
+Resolutions: 
+Letting Glimmer Die: 
+Glimmer will happily take this route, and will offer the players a parting gift as he sinks into the muck
+From his shirt pocket he will remove a small gelatinous cube in a jar. This can be used to dissolve small objects, but will slowly grow with each new thing consumed. 
+Fixing the machine: 
+DC 16 arcana check reveals a miscalibration of the retro diffuser. This creates a phase dephase unsync, preventing the device from properly conjunctively disrupting the gelatin’s structure. An even higher check, dc 18, will allow the players to fix this. 
+If Glimmer is removed at this point, he can also help the players and provide advantage. 
+The players receive the same reward as above
+The players also learn of the Unending Faire in marthommar, a continual celebration of technology, magic, and wonder held since the city’s inception. 
+This faire is unavailable to the public without the purchase of a 50gp ticket, and, for saving him, he would be more than willing to claim the party is his team if they so needed it. 
 
 
