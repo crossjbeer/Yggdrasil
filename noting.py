@@ -1,16 +1,16 @@
-import os 
-import psycopg2 
-
-import openai
-openai.api_key = os.getenv('OPENAI_AUTH')
+from openai import OpenAI
+import numpy as np 
 
 from chatter import Chatter 
 from tokenizer import Tokenizer 
 from colorcodes import Colorcodes
 
 from parsers import make_parser_gpt_sql
+from pg_vector import grab_k
+from pg_embed import create_embedding
 
-from pg_embed import grab_k    
+def sortXbyY(X, Y):
+    return([x for _, x in sorted(zip(Y, X))])
 
 LORE_MASTER = """You are the LORE MASTER.
 You preside a cherished campaign of Dungeons and Dragons (dnd).
@@ -30,7 +30,6 @@ Please use IGOR's summary to accurately answer the USER's query!
 Remember, these notes are sacred and should be adheared to. 
 Be thorough and give the user the specific detail they are interested in.   
 And most importantly, be creative and have fun!"""
-
 
 IGOR = """ 
 You are a world-class researcher and have access to the sacred notes of a dnd campaign.
@@ -54,6 +53,7 @@ def main():
 
     tizer = Tokenizer(args.model)
     chatter = Chatter(args.model)
+    chatter1 = Chatter('gpt-3.5-turbo-16k')
     color = Colorcodes()
     
     gpta = [] 
@@ -71,24 +71,36 @@ def main():
             prompt = chatter.usrprompt()
 
         print(color.pred("\tConverting query into Embedding..."))
-        response = openai.Embedding.create(
-            input=prompt,
-            model=args.embedder
-        )
-        embedding = response['data'][0]['embedding']
+        embed_response = create_embedding(prompt, args.embedder)
+        embedding = embed_response['data'][0]['embedding']
 
         print(color.pred(f'\tGrabbing {args.nvector} Associated Note Vectors'))
         vec = grab_k(embedding, k=args.nvector, **vars(args))
 
-        content_list = vec['content']
-        name_list    = vec['note']
-        for ccont, cname in zip(content_list, name_list):
-            msg = f"""NOTE: {cname}\n\n```{ccont}```"""
+        unique_notes = np.unique(vec['note'])
+
+        for note in unique_notes:
+            content = [] 
+            starting_lines = [] 
+            for i in range(len(vec['note'])):
+                if(vec['note'][i] == note):
+                    content.append(vec['content'][i])
+                    starting_lines.append(vec['start_line'][i])
+
+            content = sortXbyY(content, starting_lines)
+            content = "".join(content)
+
+            msg = f"""NOTE: {note}\n\n```{content}```"""
             gptb.append(chatter.getUsrMsg(msg))
+
+        #for ccont, cname in zip(content_list, name_list):
+        #    msg = f"""NOTE: {cname}\n\n```{ccont}```"""
+        #    gptb.append(chatter.getUsrMsg(msg))
+
         gptb.append(chatter.getUsrMsg('USER QUERY: {}'.format(prompt)))
 
         print(color.pbold(color.pred('\tSummarizing with IGOR...')))
-        gptb_reply = chatter.passMessagesGetReply(gptb)
+        gptb_reply = chatter1.passMessagesGetReply(gptb)
 
         gpta_msg = f"""IGOR SUMMARY: {gptb_reply}\n\nUSER QUERY: {prompt}"""
         gpta.append(chatter.getUsrMsg(gpta_msg))

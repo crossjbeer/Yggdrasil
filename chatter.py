@@ -1,11 +1,11 @@
-import openai 
+from openai import OpenAI
 import os 
 import datetime as dt 
 
 from tokenizer import Tokenizer
 from colorcodes import Colorcodes 
 
-openai.api_key = os.getenv('OPENAI_AUTH')
+#openai.api_key = os.getenv('OPENAI_AUTH')
 
 c = Colorcodes()
 
@@ -19,6 +19,8 @@ class Chatter():
         self.log=None
         self.log = self.getLog(self.logfile)
 
+        self.client = OpenAI(api_key=os.environ.get("OPENAI_AUTH"))
+
     def getFuncNameFromResponse(self, response):
         return(response['function_call']['name'])
     
@@ -27,19 +29,11 @@ class Chatter():
         return(json.loads(response['function_call']['arguments']))
 
     def passMessagesGetCompletion(self, messages, functions=[]):
-        if(functions):
-            completion = openai.ChatCompletion.create(
-                    model=self.model ,
-                    messages= messages,
-                    functions=functions if functions else None
-                )
-            
-        else:
-            completion = openai.ChatCompletion.create(
-                    model=self.model ,
-                    messages= messages)
+        chat_completion = self.client.chat.completions.create(
+                        messages=messages,
+                        model=self.model)
         
-        return(completion)
+        return(chat_completion)
     
     def getUsrMsg(self, message):
         return({'role':'user', 'content':message})
