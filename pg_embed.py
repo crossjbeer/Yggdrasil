@@ -42,8 +42,9 @@ def create_embedding(text, embedding_model='text-embedding-ada-002'):
         )
 
         response = client.embeddings.create(input=text, model=embedding_model)
-
+        print(response)
         return response.model_dump()
+    
     except Exception as e:
         print("Problem building embedding for text:")
         print(text)
