@@ -88,7 +88,9 @@ def noting():
         except Exception as e: 
             return({'error':101, 'message':str(e)})
     else:
+        print("Building chat...")
         chat_id = start_chat(connection, prompt, role='user')
+        print(f"Id: {chat_id}")
 
     print("Building Chatter...")
     chatter = Chatter(model)
