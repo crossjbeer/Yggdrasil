@@ -111,7 +111,7 @@ def ask_loremaster(prompt, igor_reply, chatter, messages=[], loremaster_prompt =
 
     reply = chatter.passMessagesGetReply(messages)
 
-    return(reply)
+    return(reply, messages)
 
 
 def noting(model, query, nvector, embedder, host, port, user, password, database, lore_master=LORE_MASTER, igor=IGOR, verbose=True, *args, **kwargs):

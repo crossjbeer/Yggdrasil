@@ -89,16 +89,14 @@ def noting():
         igor_reply = ask_igor(prompt, embedder, model, nvector, chatter=chatter, verbose=True)
     except Exception as e: 
         return({'error':103, 'message':str(e)})
-    
-    loremaster_msg = f"""IGOR SUMMARY: {igor_reply}\n\nUSER QUERY: {prompt}"""
-    append_message(connection, chat_id, loremaster_msg, role='user')
 
     try:
         print("Asking LORE MASTER...")
-        loremaster_reply = ask_loremaster(prompt, igor_reply, chatter, messages=messages)
+        loremaster_reply, messages = ask_loremaster(prompt, igor_reply, chatter, messages=messages)
     except Exception as e:
         return({'error':104, 'message':str(e)})
 
+    append_message(connection, chat_id, messages[-1], role='user')
     append_message(connection, chat_id, loremaster_reply, role='assistant')
     return({'response':loremaster_reply})
     
