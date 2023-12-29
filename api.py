@@ -113,4 +113,4 @@ if __name__ == '__main__':
     parser = make_parser_gpt_sql()
     args = parser.parse_args()
 
-    app.run()
+    app.run(host='0.0.0.0')
