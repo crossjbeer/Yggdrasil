@@ -47,74 +47,101 @@ Please refer to the question and summarize any information relevant to that ques
 """
 
 
+def organize_notes_from_vectors(vectors):
+    unique_notes = np.unique(vectors['note'])
+
+    notes = {}
+    for note in unique_notes:
+        content = [] 
+        starting_lines = [] 
+        for i in range(len(vectors['note'])):
+            if(vectors['note'][i] == note):
+                content.append(vectors['content'][i])
+                starting_lines.append(vectors['start_line'][i])
+
+        content = sortXbyY(content, starting_lines)
+        content = "".join(content)
+
+        msg = f"""NOTE: {note}\n\n```{content}```"""
+        notes[note] = msg
+        #gptb.append(chatter.getUsrMsg(msg))
+
+    return(notes)
+
+def ask_igor(prompt, embedder='text-embedding-ada-002', model='gpt-3.5-turbo', nvector=5, host='localhost', port='', user='crossland', password='pass', database='yggdrasil', chatter=None, igor_prompt=IGOR, verbose=False):
+    color = Colorcodes()
+    igor_msg = [chatter.getSysMsg(igor_prompt)] if igor_prompt else [] 
+
+    if(not chatter):
+        chatter = Chatter(model)
+
+    if(verbose):
+        print(color.pred("\tConverting query into Embedding..."))
+    embed_response = create_embedding(prompt, embedder)
+    embedding = embed_response['data'][0]['embedding']
+
+    if(verbose):
+        print(color.pred(f'\tGrabbing {nvector} Associated Note Vectors'))
+    vec = grab_k(embedding, k=nvector, host=host, port=port, user=user, password=password, database=database)
+
+    igor_notes = organize_notes_from_vectors(vec)
+    for note in igor_notes:
+        igor_msg.append(chatter.getUsrMsg(igor_notes[note]))
+
+    igor_msg.append(chatter.getUsrMsg('USER QUERY: {}'.format(prompt)))
+
+    if(verbose):
+        print(color.pbold(color.pred('\tSummarizing with IGOR...')))
+    igor_reply = chatter.passMessagesGetReply(igor_msg)
+
+    return(igor_reply)
+
+def ask_loremaster(prompt, igor_reply, chatter, messages=[], loremaster_prompt = LORE_MASTER, verbose=False):
+    color = Colorcodes()
+
+    if(not len(messages)):
+        messages.append(chatter.getUsrMsg(loremaster_prompt))
+
+    loremaster_msg = f"""IGOR SUMMARY: {igor_reply}\n\nUSER QUERY: {prompt}"""
+    messages.append(chatter.getUsrMsg(loremaster_msg))
+
+    if verbose:
+        print(color.pbold(color.pred('\tPassing to LORE MASTER...')))
+
+    reply = chatter.passMessagesGetReply(messages)
+
+    return(reply)
+
+
+def noting(model, query, nvector, embedder, host, port, user, password, database, lore_master=LORE_MASTER, igor=IGOR, verbose=True, *args, **kwargs):
+    color = Colorcodes()
+    print(color.pbold(f'~~ Chatting with {model} ~~'))
+    chatter = Chatter(model)
+
+    loremaster_msg = [] 
+    prompt = query if query else chatter.usrprompt()
+    while True:
+        if(prompt is None):
+            prompt = chatter.usrprompt()
+
+        igor_reply = ask_igor(prompt, embedder, model, nvector, host, port, user, password, database, chatter, igor, verbose=verbose)
+
+        loremaster_reply, loremaster_msg = ask_loremaster(prompt, igor_reply, chatter, messages=loremaster_msg, verbose=verbose)
+        loremaster_msg.append(chatter.getAssMsg(loremaster_reply))
+
+        chatter.printMessages(loremaster_msg[-2:])
+        input('Continue?')
+
+        prompt = None 
+
+
+
+
 def main():
     parser = make_parser_gpt_sql()
     args = parser.parse_args() 
 
-    tizer = Tokenizer(args.model)
-    chatter = Chatter(args.model)
-    chatter1 = Chatter('gpt-3.5-turbo-16k')
-    color = Colorcodes()
-    
-    gpta = [] 
-    gpta.append(chatter.getSysMsg(LORE_MASTER))
-
-    prompt = args.query
-    if(not prompt or not len(prompt)):
-        prompt = chatter.usrprompt()
-
-    print(color.pbold(f'~~ Chatting with {args.model} ~~'))
-    while True:
-        gptb = [chatter.getSysMsg(IGOR)]
-
-        if(prompt is None):
-            prompt = chatter.usrprompt()
-
-        print(color.pred("\tConverting query into Embedding..."))
-        embed_response = create_embedding(prompt, args.embedder)
-        embedding = embed_response['data'][0]['embedding']
-
-        print(color.pred(f'\tGrabbing {args.nvector} Associated Note Vectors'))
-        vec = grab_k(embedding, k=args.nvector, **vars(args))
-
-        unique_notes = np.unique(vec['note'])
-
-        for note in unique_notes:
-            content = [] 
-            starting_lines = [] 
-            for i in range(len(vec['note'])):
-                if(vec['note'][i] == note):
-                    content.append(vec['content'][i])
-                    starting_lines.append(vec['start_line'][i])
-
-            content = sortXbyY(content, starting_lines)
-            content = "".join(content)
-
-            msg = f"""NOTE: {note}\n\n```{content}```"""
-            gptb.append(chatter.getUsrMsg(msg))
-
-        #for ccont, cname in zip(content_list, name_list):
-        #    msg = f"""NOTE: {cname}\n\n```{ccont}```"""
-        #    gptb.append(chatter.getUsrMsg(msg))
-
-        gptb.append(chatter.getUsrMsg('USER QUERY: {}'.format(prompt)))
-
-        print(color.pbold(color.pred('\tSummarizing with IGOR...')))
-        gptb_reply = chatter1.passMessagesGetReply(gptb)
-
-        gpta_msg = f"""IGOR SUMMARY: {gptb_reply}\n\nUSER QUERY: {prompt}"""
-        gpta.append(chatter.getUsrMsg(gpta_msg))
-
-        print(color.pbold(color.pred('\tPassing to LORE MASTER...')))
-        reply = chatter.passMessagesGetReply(gpta)
-
-        gpta.append(chatter.getAssMsg(reply))
-
-        chatter.printMessages(gpta)
-
-        input('Continue?')
-
-        prompt = None 
+    noting(**vars(args))
 
         
 
