@@ -76,7 +76,8 @@ def ask_igor(prompt, embedder='text-embedding-ada-002', model='gpt-3.5-turbo', n
         chatter = Chatter(model)
 
     if(verbose):
-        print(color.pred("\tConverting query into Embedding..."))
+        print(color.pred(f"\tConverting query into Embedding with model {embedder}..."))
+
     embed_response = create_embedding(prompt, embedder)
     embedding = embed_response['data'][0]['embedding']
 
