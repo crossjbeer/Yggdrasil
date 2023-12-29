@@ -97,7 +97,7 @@ def noting():
         print(e)
         return({'error':104, 'message':str(e)})
 
-    append_message(connection, chat_id, messages[-1], role='user')
+    append_message(connection, chat_id, messages[-1]['content'], role='user')
     append_message(connection, chat_id, loremaster_reply, role='assistant')
     return({'response':loremaster_reply})
     
