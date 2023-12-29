@@ -9,7 +9,7 @@ from chatter import Chatter
 
 HOST = 'localhost'
 PORT = '5432'
-DATABASE = 'yggy'
+DATABASE = 'yggdrasil'
 
 parser = make_parser_gpt_sql()
 args= parser.parse_args()
