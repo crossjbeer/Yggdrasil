@@ -91,7 +91,7 @@ def noting():
         return({'error':103, 'message':str(e)})
     
     loremaster_msg = f"""IGOR SUMMARY: {igor_reply}\n\nUSER QUERY: {prompt}"""
-    append_message(connection, loremaster_msg, chat_id, role='user')
+    append_message(connection, chat_id, loremaster_msg, role='user')
 
     try:
         print("Asking LORE MASTER...")
