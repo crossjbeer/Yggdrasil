@@ -123,6 +123,9 @@ def start_chat(connection, initial_message, role, table_name='chat_text', chat_i
 
         title_str = reply
 
+        if(title_str == '<None>' or title_str == 'None' or title_str == 'none' or title_str == 'NONE' or title_str == ''):
+            title_str = initial_message
+
     try:
         with connection.cursor() as cursor:
             # Insert initial message
