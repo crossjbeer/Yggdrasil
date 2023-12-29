@@ -66,8 +66,11 @@ def noting():
     embedder = 'text-embedding-ada-002'
     try:
         embedder = request.args.get('embedder')
+        print("GRABBED EMBEDDER")
     except:
         pass
+
+    print("EMBEDDER:", embedder)
 
     model = 'gpt-3.5-turbo-1106'
     try:
