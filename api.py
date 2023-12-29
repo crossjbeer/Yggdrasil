@@ -57,59 +57,47 @@ def noting():
     if(not connection):
         return({'error':101, 'message':'Could not connect to database'})
 
-    nvector = 10
-    try:
-        nvector = request.args.get('nvector')
-    except:
-        pass
+    nvector = request.args.get('nvector')
+    if(not nvector):    
+        nvector = 10
 
-    embedder = 'text-embedding-ada-002'
-    try:
-        embedder = request.args.get('embedder')
-        print("GRABBED EMBEDDER")
-    except:
-        pass
+    embedder = request.args.get('embedder')
+    if(not embedder):
+        embedder = 'text-embedding-ada-002'
 
-    print("EMBEDDER:", embedder)
+    model = request.args.get('model')
+    if(not model):
+        model='gpt-3.5-turbo-1106'
 
-    model = 'gpt-3.5-turbo-1106'
-    try:
-        model = request.args.get('model')
-    except:
-        pass 
-
-    chat_id = None 
-    messages = [] 
-    try:
-        chat_id = request.args.get('chat_id')
-    except:
-        pass 
-
-    if(chat_id):
+    chat_id = request.args.get('chat_id')
+    if(not chat_id):
+        try:
+            chat_id = start_chat(connection, prompt, role='user')
+            messages = [] 
+        except Exception as e:
+            return({'error':101, 'message':str(e)})
+    else:
         try:
             messages = grab_chat(connection, chat_id)
         except Exception as e: 
-            return({'error':101, 'message':str(e)})
-    else:
-        print("Building chat...")
-        chat_id = start_chat(connection, prompt, role='user')
-        print(f"Id: {chat_id}")
+            return({'error':102, 'message':str(e)})
 
     print("Building Chatter...")
     chatter = Chatter(model)
     try:
         print("Asking IGOR...")
         igor_reply = ask_igor(prompt, embedder, model, nvector, chatter=chatter, verbose=True)
+    except Exception as e: 
+        return({'error':103, 'message':str(e)})
 
+    try:
         print("Asking LORE MASTER...")
         loremaster_reply = ask_loremaster(prompt, igor_reply, chatter, messages=messages)
+    except:
+        return({'error':104, 'message':str(e)})
 
-        append_message(connection, chat_id, loremaster_reply, role='assistant')
-        return({'response':loremaster_reply})
-    
-    except Exception as e:  
-        print(e)
-        return({'error':101, 'message':str(e)})
+    append_message(connection, chat_id, loremaster_reply, role='assistant')
+    return({'response':loremaster_reply})
     
 
 
