@@ -61,7 +61,6 @@ def grab_chat(connection, chat_id, chat_text_table='chat_text', chat_id_col='cha
             )
             cursor.execute(query, (chat_id,))
             texts = cursor.fetchall()
-            #return [text[0] for text in texts]
             return(texts)
     except psycopg2.Error as e:
         print("Error grabbing chat:", e)

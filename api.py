@@ -94,6 +94,7 @@ def noting():
         print("Asking LORE MASTER...")
         loremaster_reply, messages = ask_loremaster(prompt, igor_reply, chatter, messages=messages, verbose=True)
     except Exception as e:
+        print(e)
         return({'error':104, 'message':str(e)})
 
     append_message(connection, chat_id, messages[-1], role='user')
