@@ -105,6 +105,7 @@ def noting():
         return({'response':loremaster_reply})
     
     except Exception as e:  
+        print(e)
         return({'error':101, 'message':str(e)})
     
 
