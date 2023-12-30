@@ -8,6 +8,7 @@ from colorcodes import Colorcodes
 from parsers import make_parser_gpt_sql
 from pg_vector import grab_k
 from pg_embed import create_embedding
+from pg_chat import start_chat, append_message, connect
 
 def sortXbyY(X, Y):
     return([x for _, x in sorted(zip(Y, X))])
@@ -113,11 +114,19 @@ def ask_loremaster(prompt, igor_reply, chatter, messages=[], loremaster_prompt =
 
     return(reply, messages)
 
-
 def noting(model, query, nvector, embedder, host, port, user, password, database, lore_master=LORE_MASTER, igor=IGOR, verbose=True, *args, **kwargs):
     color = Colorcodes()
     print(color.pbold(f'~~ Chatting with {model} ~~'))
     chatter = Chatter(model)
+
+    try:
+        connection = connect(**kwargs)
+    except Exception as e:
+        connection = None 
+        pass 
+
+    if(connection):
+        chat_id = start_chat(connection, lore_master, 'system')
 
     loremaster_msg = [] 
     prompt = query if query else chatter.usrprompt()
@@ -127,8 +136,10 @@ def noting(model, query, nvector, embedder, host, port, user, password, database
 
         igor_reply = ask_igor(prompt, embedder, model, nvector, host, port, user, password, database, chatter, igor, verbose=verbose)
 
-        loremaster_reply, loremaster_msg = ask_loremaster(prompt, igor_reply, chatter, messages=loremaster_msg, verbose=verbose)
+        loremaster_reply, loremaster_msg = ask_loremaster(prompt, igor_reply, chatter, messages=loremaster_msg, verbose=verbose, loremaster_prompt=lore_master)
+        append_message(connection, chat_id, loremaster_msg[-1], 'user')
         loremaster_msg.append(chatter.getAssMsg(loremaster_reply))
+        append_message(connection, chat_id, loremaster_msg[-1], 'assistant')
 
         chatter.printMessages(loremaster_msg[-2:])
         input('Continue?')

@@ -160,8 +160,6 @@ class Scripter:
 
         newlines = []
         for l in lines:
-            #l = l.strip()
-
             if(not len(l)):
                 continue
 
