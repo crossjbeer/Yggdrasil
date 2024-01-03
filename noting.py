@@ -32,7 +32,7 @@ Remember, these notes are sacred and should be adheared to.
 Be thorough and give the user the specific detail they are interested in.   
 And most importantly, be creative and have fun!"""
 
-IGOR = """ 
+IGOR1 = """ 
 You are a world-class researcher and have access to the sacred notes of a dnd campaign.
 Your job is to summarize information relevant to a given USER QUERY. 
 
@@ -45,6 +45,21 @@ Relevant information from <Note Name>...
 USER QUERY: <question>
 
 Please refer to the question and summarize any information relevant to that question.
+"""
+
+IGOR = """ 
+You are a world-class researcher. 
+You will be presented with a USER QUERY.
+Your job is to read through notes and summarize any information relevant to the query. 
+
+You will see information passed with the structure: 
+USER QUERY: <question>
+
+NOTE: <Note Name>
+```
+Information from <Note Name>...
+```
+
 """
 
 
@@ -120,8 +135,8 @@ def noting(model, query, nvector, embedder, host, port, user, password, database
     chatter = Chatter(model)
 
     try:
-        connection = connect(**kwargs)
-    except Exception as e:
+        connection = connect(host, port, user, password, database)
+    except:
         connection = None 
         pass 
 
@@ -137,9 +152,11 @@ def noting(model, query, nvector, embedder, host, port, user, password, database
         igor_reply = ask_igor(prompt, embedder, model, nvector, host, port, user, password, database, chatter, igor, verbose=verbose)
 
         loremaster_reply, loremaster_msg = ask_loremaster(prompt, igor_reply, chatter, messages=loremaster_msg, verbose=verbose, loremaster_prompt=lore_master)
-        append_message(connection, chat_id, loremaster_msg[-1], 'user')
         loremaster_msg.append(chatter.getAssMsg(loremaster_reply))
-        append_message(connection, chat_id, loremaster_msg[-1], 'assistant')
+
+        if(connection):
+            append_message(connection, chat_id, loremaster_msg[-2]['content'], 'user')
+            append_message(connection, chat_id, loremaster_msg[-1]['content'], 'assistant')
 
         chatter.printMessages(loremaster_msg[-2:])
         input('Continue?')
