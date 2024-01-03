@@ -150,31 +150,25 @@ class Scripter:
         self.model = model
         self.tizer = Tokenizer(self.model)
         return(self.tizer)
-    
+
     def loadTxt(self, path, parseOnSentence=False):
         self.txt_path = path 
 
         txt = open(path, 'r')
         lines = txt.readlines() 
 
-        newlines = []
-        for l in lines:
-            if(not len(l)):
+        sentences = []
+        for line in lines:
+            if not line.strip():
                 continue
 
-            if('.' in l):
-                newlines += l.split('.')
-            elif('!' in l):
-                newlines += l.split('!')
-            elif('?' in l):
-                newlines += l.split('?')
+            if parseOnSentence:
+                sentences += re.split(r'(?<=[.!?])\s+', line)
             else:
-                newlines += [l]
+                sentences.append(line)
 
-        lines = newlines
-
-        df = pd.DataFrame(lines, index=range(len(lines)), columns=['text'])
-        return(df)
+        df = pd.DataFrame(sentences, columns=['text'])
+        return df
 
 
     def loadCSV(self, path, *args, **kwargs):
@@ -182,7 +176,7 @@ class Scripter:
 
         df = pd.read_csv(self.csv_path, *args, **kwargs)
 
-        return(df)
+        return df
     
     def connectPostgreSQL(self, host, db, user, password):
         try:
