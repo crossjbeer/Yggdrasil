@@ -1,6 +1,5 @@
 import pandas as pd 
 import re 
-#import mysql.connector 
 import psycopg2
 
 
@@ -218,7 +217,6 @@ class Scripter:
         self.connection = connection
         return(connection)
 
-    
     def loadMySQL(self, table, argDict={}):
         connection = self.connection
 
@@ -311,34 +309,38 @@ class Scripter:
         strRows = [": ".join(r) for r in rows]
         return(strRows)
     
-    def getTokenChunkBatchSize(self, df, tokenCost, i:int, filter=False, cols=['text']):
-        c_cost = 0 
-        bs = 0
-        while c_cost < tokenCost and bs <= len(df)-i:
-            str_rows = self.getStrRows(df, i, bs+1, cols)
-            bs += 1
 
-            if(filter):
-                str_rows = self.filterFillerLines()
+    def getAllTokenChunkBounds(self, df, tokenCost, filter=False, cols=['text'], lag=0):
+        # Initialize variables
+        cumulative_tokens = 0
+        token_bounds = []
+        current_bound_start = 0
 
-            c_cost = self.calcTokens("\n".join(str_rows))
+        # Iterate through each row in the dataframe
+        for i, row in df.iterrows():
+            # Calculate tokens for the current row
+            line_tokens = self.calcTokens(row['text'])
 
-        return(bs)
-    
-    def getTokenChunk(self, df, tokenCost, i:int, cols):
-        bs = self.getTokenChunkBatchSize(df, tokenCost, i, cols)
+            # Check if adding line_tokens exceeds the token limit
+            if cumulative_tokens + line_tokens > tokenCost:
+                # Note the token bound when the limit is exceeded
+                #token_bounds.append((current_bound_start, i))
+                token_bounds.append((max(0, current_bound_start-lag), i))
+                
+                # Reset cumulative_tokens and update the bound start index
+                cumulative_tokens = 0
+                current_bound_start = i + 1
+            else:
+                # Update cumulative_tokens if the limit is not exceeded
+                cumulative_tokens += line_tokens
 
-        return(df.iloc[i:i+bs])
-    
-    def getAllTokenChunkBounds(self, df, tokenCost, filter=False, cols=['text']):
-        i = 0
-        allChunks = [] 
-        while i < len(df):
-            bs = self.getTokenChunkBatchSize(df, tokenCost, i, filter=filter, cols=cols)
-            allChunks.append((i,i+bs))
-            i += bs
+        # Check if there are remaining rows after the last token bound
+        if current_bound_start < len(df):
+            #token_bounds.append((current_bound_start, len(df) - 1))
+            token_bounds.append((max(0,current_bound_start-lag), len(df) - 1))
 
-        return(allChunks)
+        return token_bounds
+
 
     def combineRowList(self, row_list, name_dict={}):
         combined_text = ''  # Initialize an empty string for combined text
