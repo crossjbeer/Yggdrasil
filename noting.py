@@ -307,6 +307,7 @@ def ask_orchestrator(prompt, answer, chatter, orchestrator_prompt=ORCHESTRATOR, 
 
 def noting(model, query, nvector, embedder, host, port, user, password, database, lore_master=LORE_MASTER, igor=IGOR, verbose=True, *args, **kwargs):
     color = Colorcodes()
+    chat_id = None
     chatter = Chatter(model)
 
     print(color.pbold(f'~~ Chatting with {model} ~~'))
@@ -317,13 +318,11 @@ def noting(model, query, nvector, embedder, host, port, user, password, database
         connection = None 
         pass 
 
-    #if(connection):
-    #    chat_id = start_chat(connection, lore_master, 'system')
+    if(connection):
+        chat_id = start_chat(connection, lore_master, 'system', title=True, title_msg=query)
 
     loremaster_msg = [] 
-    prompt = query if query else chatter.usrprompt()
-
-    chat_id = None 
+    prompt = query
     while True:
         if(prompt is None):
             prompt = chatter.usrprompt()
@@ -359,6 +358,49 @@ def info_grab(prompt, nvec, embedder, namespace=None, *args, **kwargs):
 
     return(vec)
 
+def orchestrate_step(prompt, model, chatter, nvector, embedder, verbose, toolmaster=TOOLMASTER, igor=IGOR, loremaster=LORE_MASTER, orchestrator=ORCHESTRATOR, tools=TOOLS, loremaster_dialogue=[], *args, **kwargs):
+    color = Colorcodes() 
+    remaining_tools = tools.copy()
+    used_tools = OrderedDict()
+    igor_summaries = OrderedDict()
+
+    tm_reply = ask_toolmaster(prompt, chatter, TOOLS, verbose=verbose)
+    print(color.pred(f'\tRanked Tools: {tm_reply}'))
+    for ranked_tool in tm_reply: 
+        ranked_tool = ranked_tool.lower().strip()
+
+        if(ranked_tool not in tools):
+            continue 
+
+        namespace = ranked_tool 
+        used_tools[ranked_tool] = tools[ranked_tool]
+        remaining_tools.pop(ranked_tool)
+
+        print(color.pred(f"Grabbing notes from {ranked_tool}..."))
+        note_vector = info_grab(prompt, nvector, embedder, namespace=namespace, *args, **kwargs)
+        igor_notes  = organize_notes_from_vectors(note_vector)
+
+        igor_summary = ask_igor_small(prompt, igor_notes, chatter, model, igor, verbose=verbose)
+        igor_summaries[ranked_tool] = igor_summary
+
+        full_igor_summary = ""
+        for note in igor_summaries: 
+            full_igor_summary += f"Knowledge Source: {note}\n\nIgor Summary:\n{igor_summaries[note]}"
+
+        loremaster_reply, _ = ask_loremaster(prompt, full_igor_summary, chatter, messages=loremaster_dialogue, verbose=verbose, loremaster_prompt=loremaster)
+
+        orchestrator_reply = ask_orchestrator(prompt, loremaster_reply, chatter, verbose=verbose, used_tools=used_tools, remaining_tools=remaining_tools, previous_messages=loremaster_dialogue, orchestrator_prompt=orchestrator)
+        orchestrator_reply = orchestrator_reply.lower().strip()
+
+        print(orchestrator_reply)
+        if('not adequate' in orchestrator_reply or 'not adequately' in orchestrator_reply):
+            continue 
+
+        if(not len(orchestrator_reply) or 'no changes' in orchestrator_reply or 'this answer is adequate.' in orchestrator_reply or 'the answer is adequate.' in orchestrator_reply or 'adequate' in orchestrator_reply):
+            break 
+
+    return(loremaster_reply)
+
 
 from collections import OrderedDict
 def orchestrate(model, query, nvector, embedder, lore_master=LORE_MASTER, igor=IGOR, verbose=True, *args, **kwargs):
@@ -375,48 +417,9 @@ def orchestrate(model, query, nvector, embedder, lore_master=LORE_MASTER, igor=I
         if(prompt is None):
             prompt = chatter.usrprompt()
 
-        remaining_tools = TOOLS.copy()
-        used_tools = OrderedDict()
-
-        tm_reply = ask_toolmaster(prompt, chatter, TOOLS, verbose=verbose)
-        print("Ranked Tools: ", tm_reply)
-
-        igor_summaries = OrderedDict()
-        for ranked_tool in tm_reply: 
-            ranked_tool = ranked_tool.lower().strip()
-
-            if(ranked_tool not in TOOLS):
-                continue 
-
-            namespace = ranked_tool 
-            used_tools[ranked_tool] = TOOLS[ranked_tool]
-            remaining_tools.pop(ranked_tool)
-
-            print(color.pred(f"Grabbing notes from {ranked_tool}..."))
-            note_vector = info_grab(prompt, nvector, embedder, namespace=namespace, *args, **kwargs)
-            igor_notes  = organize_notes_from_vectors(note_vector)
-
-            igor_summary = ask_igor_small(prompt, igor_notes, chatter, model, igor, verbose=verbose)
-            igor_summaries[ranked_tool] = igor_summary
-
-            full_igor_summary = ""
-            for note in igor_summaries: 
-                full_igor_summary += f"Knowledge Source: {note}\n\nIgor Summary:\n{igor_summaries[note]}"
-
-            loremaster_reply, loremaster_msg = ask_loremaster(prompt, full_igor_summary, chatter, messages=loremaster_dialogue, verbose=verbose, loremaster_prompt=lore_master)
-
-            orchestrator_reply = ask_orchestrator(prompt, loremaster_reply, chatter, verbose=verbose, used_tools=used_tools, remaining_tools=remaining_tools, previous_messages=loremaster_dialogue, orchestrator_prompt=ORCHESTRATOR)
-            orchestrator_reply = orchestrator_reply.lower().strip()
-
-            print(orchestrator_reply)
-            if('not adequate' in orchestrator_reply or 'not adequately' in orchestrator_reply):
-                continue 
-
-            if(not len(orchestrator_reply) or 'no changes' in orchestrator_reply or 'this answer is adequate.' in orchestrator_reply or 'the answer is adequate.' in orchestrator_reply or 'adequate' in orchestrator_reply):
-                break 
-
-        #loremaster_dialogue.append(loremaster_msg[-1])
+        loremaster_reply = orchestrate_step(prompt, model, chatter, nvector, embedder, verbose, toolmaster=TOOLMASTER, igor=igor, loremaster=lore_master, orchestrator=ORCHESTRATOR, *args, **kwargs)
         loremaster_dialogue.append(chatter.getAssMsg(loremaster_reply))
+
         print(color.pgreen(loremaster_reply))
         input('Continue?')
 
