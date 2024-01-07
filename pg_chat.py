@@ -109,19 +109,22 @@ def append_message(connection, chat_id, text, role, table_name='chat_text', chat
         connection.rollback()
         print("Error appending message:", e)
 
-def start_chat(connection, initial_message, role, table_name='chat_text', chat_id_col='chat_id', text_col='text', role_col='role', title=True):
+def start_chat(connection, initial_message, role, table_name='chat_text', chat_id_col='chat_id', text_col='text', role_col='role', title=True, title_msg=None, title_model='gpt-3.5-turbo-1106'):
     # Start a new chat with an initial message
     if(title):
-        chat = Chatter('gpt-3.5-turbo')
         messages = []
+        chat = Chatter(title_model)
 
         messages.append(chat.getUsrMsg('Please read the following message. Create a title describing the intention this message. If a suitable title cannot be made, please write <None>. DO NOT preface your title. DO NOT write anything after. DO NOT write things like <summary:> or <title:>'))
-        messages.append(chat.getUsrMsg(initial_message))
+
+        if(title_msg):
+            messages.append(chat.getUsrMsg(title_msg))
+        else:
+            messages.append(chat.getUsrMsg(initial_message))
 
         reply = chat.passMessagesGetReply(messages)
 
         title_str = reply
-
         if(title_str == '<None>' or title_str == 'None' or title_str == 'none' or title_str == 'NONE' or title_str == '' or len(title_str) > 255):
             title_str = initial_message
 
