@@ -100,6 +100,52 @@ def noting():
     append_message(connection, chat_id, messages[-1]['content'], role='user')
     append_message(connection, chat_id, loremaster_reply, role='assistant')
     return({'response':loremaster_reply})
+
+
+yggy_blueprint = Blueprint('yggy', __name__)
+@noting_blueprint.route('/yggy', methods=['GET'])
+def yggy():
+    prompt = request.args.get('prompt')
+    user = request.args.get('user')
+    password = request.args.get('password')
+    #campaign = request.args.get('campaign')
+
+    print("Connecting to database...")
+    connection = connect(HOST, PORT, user, password, DATABASE)
+
+    if(not connection):
+        return({'error':101, 'message':'Could not connect to database'})
+
+    nvector = request.args.get('nvector')
+    if(not nvector):    
+        nvector = 10
+
+    embedder = request.args.get('embedder')
+    if(not embedder):
+        embedder = 'text-embedding-ada-002'
+
+    model = request.args.get('model')
+    if(not model):
+        model='gpt-3.5-turbo-1106'
+
+    chat_id = request.args.get('chat_id')
+    if(not chat_id):
+        try:
+            chat_id = start_chat(connection, prompt, role='user')
+            messages = [] 
+        except Exception as e:
+            return({'error':101, 'message':str(e)})
+    else:
+        try:
+            messages = grab_chat(connection, chat_id)
+        except Exception as e: 
+            return({'error':102, 'message':str(e)})
+
+    
+
+    #append_message(connection, chat_id, messages[-1]['content'], role='user')
+    #append_message(connection, chat_id, loremaster_reply, role='assistant')
+    return({'response':loremaster_reply})
     
 
 
