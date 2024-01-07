@@ -167,6 +167,8 @@ class Scripter:
             else:
                 sentences.append(line)
 
+        #sentences = [i.strip() for i in sentences]
+
         df = pd.DataFrame(sentences, columns=['text'])
         return df
 
@@ -305,6 +307,20 @@ class Scripter:
     
 
     def getAllTokenChunkBounds(self, df, tokenCost, filter=False, cols=['text'], lag=0):
+        """
+        This function is responsible for learning the token chunk boundaries on some text-holding dataframe, given some 'tokenCost' limit. 
+
+        Params: 
+        - df (Dataframe): The dataframe holding the text to be chunked
+        - tokenCost (int): The token limit per chunk
+        - filter (bool): Whether or not to filter out filler words
+        - cols (list): The columns to be used for chunking
+        - lag (int): The lag between token chunks (any value > 0 will result in overlapping chunks and less certainty of the tokens/ chunk)
+
+        Returns:
+        - token_bounds (list): A list of tuples representing the token chunk boundaries
+        """
+
         # Initialize variables
         cumulative_tokens = 0
         token_bounds = []
@@ -315,25 +331,38 @@ class Scripter:
             # Calculate tokens for the current row
             line_tokens = self.calcTokens(row['text'])
 
+            #print("Tokens: {} | {}".format(line_tokens, cumulative_tokens + line_tokens))
+
             # Check if adding line_tokens exceeds the token limit
             if cumulative_tokens + line_tokens > tokenCost:
                 # Note the token bound when the limit is exceeded
-                #token_bounds.append((current_bound_start, i))
                 token_bounds.append((max(0, current_bound_start-lag), i))
                 
                 # Reset cumulative_tokens and update the bound start index
-                cumulative_tokens = 0
-                current_bound_start = i + 1
+                #cumulative_tokens = 0
+                #current_bound_start = i + 1
+
+                cumulative_tokens = line_tokens 
+                current_bound_start = i 
             else:
                 # Update cumulative_tokens if the limit is not exceeded
                 cumulative_tokens += line_tokens
 
         # Check if there are remaining rows after the last token bound
         if current_bound_start < len(df):
-            #token_bounds.append((current_bound_start, len(df) - 1))
             token_bounds.append((max(0,current_bound_start-lag), len(df) - 1))
 
         return token_bounds
+    
+    def splitDFIntoTokenChunks(self, df, tokenCost, filter=False, cols=['text'], lag=0):
+        token_bounds = self.getAllTokenChunkBounds(df, tokenCost, filter, cols, lag)
+
+        chunks = []
+        for i, j in token_bounds:
+            chunks.append(self.getDFRows(df, i, j-i, cols))
+
+        return(chunks)
+    
 
 
     def combineRowList(self, row_list, name_dict={}):
@@ -387,7 +416,9 @@ class Scripter:
     def getText(self, df):
         txt = "" 
         for t in df.text:
-            txt += t + '\n'
+            #txt += t + '\n'
+            txt += t
+
         return(txt)
     
     def cleanText(self, text, anon=True, lower=True, stripper=True, contractions=True, punct=True, stopword=False, namedict=None):
@@ -472,8 +503,7 @@ def jaccard_distance(list_of_strings, input_string):
 
     return distances
 
-
-if __name__ == "__main__":
+def main():
     tizer = Tokenizer(name='gpt-4')
 
     script = Scripter()
@@ -496,13 +526,56 @@ if __name__ == "__main__":
 
         dist = jaccard_distance([chunk], query)
 
-        #print('[{}] : {}'.format(chunk, dist))
-        #input()
-
         chunks.append((dist, chunk))
 
     chunks = sorted(chunks, key=lambda x: x[0])
-    #print(chunks[:10])
     for i in chunks[:10]:
         print(i)
+
+def main1():
+    script = Scripter() 
+    script.loadTokenizer('ada-002')
+
+    df = script.loadTxt('./phb/PH.txt', parseOnSentence=True)
+    note_chunks = script.splitDFIntoTokenChunks(df, 1000, lag=0)
+
+    for i, chunk in enumerate(note_chunks):
+        chunk_tok = 0
+        chunk_tok_vals=[]
+        for i, row in chunk.iterrows():
+            tokens = script.tizer.calculate_tokens(row['text'])
+            chunk_tok += tokens 
+            chunk_tok_vals.append(tokens)
+
+        chunk['tokens'] = chunk_tok_vals
+
+        if(chunk_tok > 1099):
+            print("Chunk {}".format(i))
+            print(chunk)
+            print("TOO MANY TOKENS: {}".format(chunk_tok))
+            
+            input()
+    
+    tokens = [] 
+    chars = [] 
+    for i, line in df.iterrows():
+        text = line['text']
+        tok = script.tizer.calculate_tokens(text)
+
+        tokens.append(tok)
+        chars.append(len(text))
+
+    df['tokens'] = tokens
+    df['chars'] = chars
+
+    print(df)
+
+    print("MAX: {}".format(max(tokens)))
+    print("MIN: {}".format(min(tokens)))
+    print("AVG: {}".format(sum(tokens)/len(tokens)))
+    print("MED: {}".format(sorted(tokens)[len(tokens)//2]))
+
+
+if __name__ == "__main__":
+    main1()
 
