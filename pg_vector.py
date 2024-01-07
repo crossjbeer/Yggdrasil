@@ -9,7 +9,7 @@ openai.api_key = os.getenv('OPENAI_AUTH')
 
 from pg_chat import connect 
 
-def grab_k(search_vector, host, port, user, password, database, notes_table='notes', k=1, *args, **kwargs):
+def grab_k(search_vector, host, port, user, password, database, notes_table='notes', k=1, namespace=None, *args, **kwargs):
     connection = connect(host, port, user, password, database)
     if(not connection):
         exit("No Connection")
@@ -29,10 +29,13 @@ def grab_k(search_vector, host, port, user, password, database, notes_table='not
             print(e)
             exit()
 
-    query = "SELECT content, note, start_line, end_line FROM {} ORDER BY (embedding <=> %s) LIMIT {};".format(notes_table, k)
+    if(namespace):
+        query = "SELECT content, note, start_line, end_line FROM {} WHERE namespace = %s ORDER BY (embedding <=> %s) LIMIT {};".format(notes_table, k)
+    else:
+        query = "SELECT content, note, start_line, end_line FROM {} ORDER BY (embedding <=> %s) LIMIT {};".format(notes_table, k)
 
     try:
-        cursor.execute(query, (search_vector,))
+        cursor.execute(query, (namespace, search_vector,))
         columns = [desc[0] for desc in cursor.description]
 
         res = cursor.fetchall()

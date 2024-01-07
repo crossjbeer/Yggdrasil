@@ -25,7 +25,8 @@ def create_note_table(conn):
             start_line INT, 
             end_line INT,
             embedding vector(1536),  
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            namespace VARCHAR(255)
         )""")
     conn.commit()
     cursor.close()
@@ -88,3 +89,4 @@ def main():
 
 if __name__ == "__main__":
     main() 
+
