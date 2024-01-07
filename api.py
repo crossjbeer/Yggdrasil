@@ -3,7 +3,7 @@ from openai import OpenAI
 import os 
 from parsers import make_parser_gpt_sql
 from pg_chat import connect, grab_chat, start_chat, append_message
-from noting import ask_igor, ask_loremaster
+from noting import ask_igor, ask_loremaster, orchestrate_step
 
 from chatter import Chatter 
 
@@ -141,11 +141,14 @@ def yggy():
         except Exception as e: 
             return({'error':102, 'message':str(e)})
 
-    
+    chatter = Chatter(model)
+    reply = orchestrate_step(prompt, model, chatter, nvector, embedder, verbose=False, loremaster_dialogue=messages, host=HOST, port=PORT, user=user, password=password, database=DATABASE)
+
+
 
     #append_message(connection, chat_id, messages[-1]['content'], role='user')
     #append_message(connection, chat_id, loremaster_reply, role='assistant')
-    return({'response':loremaster_reply})
+    return({'response':reply}, 200)
     
 
 
