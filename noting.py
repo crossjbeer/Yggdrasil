@@ -123,6 +123,31 @@ Example Output:
 - dungeon masters guide 
 """
 
+TOOLMASTER_TOKEN = """You are the TOOL MASTER.
+Your job is to help gather information. 
+Specifically, you gather information to help the GAME MASTER (GM) of a Dungeons and Dragons (DND) Campaign.
+
+You will be presented with THREE things: 
+1) A USER QUERY: Some question or prompt related to DND, the campaign being run, or rules in general. 
+2) A list of TOOLS: Sources of information that can be queried for information related to the USER QUERY. 
+-- Note that some sources are more useful than others for specific queries. 
+3) A set of TOKENS: These are your currency. You must spend these tokens to query the TOOLS. One query = one token. 
+
+Please assign tokens to the TOOLS. The number of tokens assigned represents the amount of queries to be made. 
+More tokens = more queries = more information from that tool. 
+
+Please return your answer as a BULLETED LIST. 
+See the example below: 
+
+RESPONSE EXAMPLE: 
+- tool 1: 3
+- tool 2: 1
+- tool 3: 0
+- tool 4: 1
+
+Now please go about your job. 
+"""
+
 ORCHESTRATOR = """You are the ORCHESTRATOR. 
 You must determine if a question has been adequately answered. 
 
@@ -196,6 +221,26 @@ def ask_toolmaster(user_query, tm_chatter, tools, toolmaster_prompt=TOOLMASTER, 
     #tm_chatter.printMessages(tm_msg)
 
     tm_reply = tm_chatter.passMessagesGetReply(tm_msg)
+    tm_reply = parse_bulleted_list(tm_reply)
+
+    return(tm_reply)
+
+def ask_toolmaster_token(user_query, chatter, tools, tokens, toolmaster=TOOLMASTER_TOKEN, verbose=False):
+    color = Colorcodes()
+    tm_msg = [chatter.getSysMsg(toolmaster)]
+
+    msg = f'USER QUERY: {user_query}'
+    msg += '\nTOOLS:'
+    for tool in tools:
+        msg += f'\n\t{tool}: {tools[tool]}'
+
+    msg += f'\nTOKENS: {tokens}'
+    tm_msg.append(chatter.getUsrMsg(msg))
+
+    if(verbose):
+        print(color.pbold(color.pred('\tPassing to TOOL MASTER...')))
+
+    tm_reply = chatter.passMessagesGetReply(tm_msg)
     tm_reply = parse_bulleted_list(tm_reply)
 
     return(tm_reply)
@@ -401,6 +446,8 @@ def orchestrate_step(prompt, model, chatter, nvector, embedder, verbose, toolmas
 
     return(loremaster_reply)
 
+def 
+
 
 from collections import OrderedDict
 def orchestrate(model, query, nvector, embedder, lore_master=LORE_MASTER, igor=IGOR, verbose=True, *args, **kwargs):
@@ -424,6 +471,44 @@ def orchestrate(model, query, nvector, embedder, lore_master=LORE_MASTER, igor=I
         input('Continue?')
 
         prompt = None 
+
+
+def orchestrate_simple(model, query, nvector, embedder, loremaster=LORE_MASTER, igor=IGOR, verbose=True, *args, **kwargs):
+    """
+    Here we will simplify the orchestration endpoint. Right now the orchestrator works after the Igor+Lore Master step. 
+    The Tool Master first ranks the tools it hopes to use. 
+    Then, the tools are looped over. 
+    For each tool, we query information, ask Igor to summarize relevant information, and pass that to the Lore Master to maintain our dialogue. 
+    Then, finally, the Orchestrator discerns if the given answer is adequate. 
+    If so, the answer is returned. Otherwise, we pass another tool's worth of info to Igor and then pass all the Igor Summaries to Lore master to generate another response. 
+    
+    I would like to change this structure. We are going to retool the toolmaster to change his functionality. 
+    We are going to give the Tool Master Tokens to spend. They will use these tokens to pull information from tools. 
+
+    Then, we will give all the information gathered to one or more Igor's to summarize. Once this is done, we pass to Lore Master and get whatever we get. 
+    We eliminate the Orchestration Step alltogether.  
+    """
+
+    color = Colorcodes()
+    chatter = Chatter(model)
+
+    print(color.pbold(f'~~ Chatting with {model} ~~'))
+
+    loremaster_dialogue = [] 
+    loremaster_dialogue.append(chatter.getSysMsg(loremaster))
+    prompt = query 
+
+    while True:
+        if(prompt is None):
+            prompt = chatter.usrprompt()
+
+        #loremaster_reply = orchestrate_step(prompt, model, chatter, nvector, embedder, verbose, toolmaster=TOOLMASTER, igor=igor, loremaster=lore_master, orchestrator=ORCHESTRATOR, *args, **kwargs)
+        loremaster_dialogue.append(chatter.getAssMsg(loremaster_reply))
+
+        print(color.pgreen(loremaster_reply))
+        input('Continue?')
+
+        prompt = None
 
 
 
