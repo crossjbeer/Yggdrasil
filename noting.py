@@ -1,15 +1,13 @@
-from openai import OpenAI
 import numpy as np 
 
 from chatter import Chatter 
-from tokenizer import Tokenizer 
 from colorcodes import Colorcodes
 
 from parsers import make_parser_gpt_sql
 from pg_vector import grab_k
-#from pg_embed import create_embedding
 from pg_embed import embed 
-from pg_chat import start_chat, append_message, connect
+from pg_chat import start_chat, connect
+from collections import OrderedDict
 
 import re
 
@@ -162,10 +160,10 @@ If the ANSWER adequately answers the USER QUERY, please write 'adequate'.
 Otherwise, if you find the question has not been adequately answered, please return ANY AND ALL criticism as a BULLETED LIST.
 """
 
-TOOLS = {'notes':'Notes written by the GAME MASTER (GM) of a dnd campaign.', 
-         'players handbook':'A book containing information one must know to be a Dungeon and Dragons PLAYER', 
-         'dungeon masters guide':'A book containing information one must know to be a Dungeons and Dragons GAME MASTER (GM)',
-         'build a character': 'A small sheet containing 10 steps on how to build a character'
+TOOLS = {'notes':'Notes written by the GAME MASTER (GM) of a dnd campaign. Useful for specific world information, NPCs, lore, etc. Not useful for rules.', 
+         'players handbook':'All information one must know to be a Dungeon and Dragons PLAYER. Includes rules for building characters, designing backgrounds, combat, spells, etc.', 
+         'dungeon masters guide':'All information required to be a Dungeons and Dragons GAME MASTER (GM). Contains rules for building encounters, designing campaigns, etc.',
+         'build a character': 'A small white-page sheet containing 10 steps on how to build a character.'
          }
 
 
@@ -189,7 +187,6 @@ def organize_notes_from_vectors(vectors):
 
     return(notes)
 
-
 def parse_bulleted_list(text):
     # Remove any leading or trailing whitespace
     text = text.strip()
@@ -202,7 +199,6 @@ def parse_bulleted_list(text):
     bullet_list = [match[1] for match in bullet_matches]
 
     return bullet_list
-
 
 def ask_toolmaster(user_query, tm_chatter, tools, toolmaster_prompt=TOOLMASTER, verbose=False):
     color = Colorcodes()
@@ -225,7 +221,7 @@ def ask_toolmaster(user_query, tm_chatter, tools, toolmaster_prompt=TOOLMASTER, 
 
     return(tm_reply)
 
-def ask_toolmaster_token(user_query, chatter, tools, tokens, toolmaster=TOOLMASTER_TOKEN, verbose=False):
+def ask_tokenmaster(user_query, chatter, tools, tokens, toolmaster=TOOLMASTER_TOKEN, verbose=False):
     color = Colorcodes()
     tm_msg = [chatter.getSysMsg(toolmaster)]
 
@@ -238,10 +234,18 @@ def ask_toolmaster_token(user_query, chatter, tools, tokens, toolmaster=TOOLMAST
     tm_msg.append(chatter.getUsrMsg(msg))
 
     if(verbose):
-        print(color.pbold(color.pred('\tPassing to TOOL MASTER...')))
+        print(color.pbold(color.pred('\tPassing to Token Master...')))
+        #chatter.printMessages(tm_msg)   
 
     tm_reply = chatter.passMessagesGetReply(tm_msg)
     tm_reply = parse_bulleted_list(tm_reply)
+    if(len(tm_reply)):
+        try: 
+            tm_reply = {tool.strip(): int(tok.strip()) for tool, tok in [reply.split(':') for reply in tm_reply]}
+        except: 
+            tm_reply = {'notes': tokens}
+    else:
+        tm_reply = {'notes': tokens}
 
     return(tm_reply)
 
@@ -290,6 +294,7 @@ def ask_igor_small(prompt, igor_notes, chatter=None, model='gpt-3.5-turbo', igor
     if(verbose):
         color = Colorcodes()
         print(color.pbold(color.pred('\tSummarizing with IGOR...')))
+        chatter.printMessages(igor_msg)
 
     igor_reply = chatter.passMessagesGetReply(igor_msg)
 
@@ -398,7 +403,6 @@ def noting(model, query, nvector, embedder, host, port, user, password, database
 
 def info_grab(prompt, nvec, embedder, namespace=None, *args, **kwargs):
     embedding = embed(prompt, embedder) 
-
     vec = grab_k(embedding, k=nvec, namespace=namespace, *args, **kwargs)
 
     return(vec)
@@ -446,10 +450,37 @@ def orchestrate_step(prompt, model, chatter, nvector, embedder, verbose, toolmas
 
     return(loremaster_reply)
 
-def 
+def tokenmaster_step(prompt, model, chatter, embedder, verbose, total_tokens = 5, toolmaster=TOOLMASTER_TOKEN, igor=IGOR, loremaster=LORE_MASTER, tools=TOOLS, loremaster_dialogue=[], *args, **kwargs):
+    color = Colorcodes() 
+    igor_summaries = OrderedDict() 
+    tm_reply = ask_tokenmaster(prompt, chatter, tools, total_tokens, verbose=verbose, toolmaster=toolmaster)
+    sorted_keys = sorted(tm_reply, key=lambda x: tm_reply[x], reverse=True)
+
+    for i, sortkey in enumerate(sorted_keys):
+        if(tm_reply[sortkey] == 0):
+            continue
+
+        print(color.pgreen(f"\t\tTool {i+1}: {sortkey} [{tm_reply[sortkey]} Tokens]"))
+
+    for i, sortkey in enumerate(sorted_keys):
+        namespace = sortkey 
+        note_vector = info_grab(prompt, tm_reply[sortkey], embedder, namespace=namespace, *args, **kwargs)
+        igor_notes = organize_notes_from_vectors(note_vector)
+
+        igor_summary = ask_igor_small(prompt, igor_notes, chatter, model, igor, verbose=verbose)
+        igor_summaries[sortkey] = igor_summary
+
+    full_igor_summary = ""
+    for note in igor_summaries: 
+        full_igor_summary += f"Knowledge Source: {note}\n\nIgor Summary:\n{igor_summaries[note]}\n\n"
+
+    print("Full Igor Summary:\n", full_igor_summary)
+
+    loremaster_reply, loremaster_msg = ask_loremaster(prompt, full_igor_summary, chatter, messages=loremaster_dialogue, verbose=verbose, loremaster_prompt=loremaster)
+
+    return(loremaster_reply, loremaster_msg)
 
 
-from collections import OrderedDict
 def orchestrate(model, query, nvector, embedder, lore_master=LORE_MASTER, igor=IGOR, verbose=True, *args, **kwargs):
     color = Colorcodes()
     chatter = Chatter(model)
@@ -473,7 +504,7 @@ def orchestrate(model, query, nvector, embedder, lore_master=LORE_MASTER, igor=I
         prompt = None 
 
 
-def orchestrate_simple(model, query, nvector, embedder, loremaster=LORE_MASTER, igor=IGOR, verbose=True, *args, **kwargs):
+def tokenmaster(model, query, nvector, embedder, loremaster=LORE_MASTER, igor=IGOR, verbose=True, *args, **kwargs):
     """
     Here we will simplify the orchestration endpoint. Right now the orchestrator works after the Igor+Lore Master step. 
     The Tool Master first ranks the tools it hopes to use. 
@@ -502,10 +533,13 @@ def orchestrate_simple(model, query, nvector, embedder, loremaster=LORE_MASTER, 
         if(prompt is None):
             prompt = chatter.usrprompt()
 
-        #loremaster_reply = orchestrate_step(prompt, model, chatter, nvector, embedder, verbose, toolmaster=TOOLMASTER, igor=igor, loremaster=lore_master, orchestrator=ORCHESTRATOR, *args, **kwargs)
+        loremaster_reply, loremaster_msg = tokenmaster_step(prompt, model, chatter, embedder, verbose, total_tokens=nvector, toolmaster=TOOLMASTER_TOKEN, igor=igor, loremaster=loremaster, orchestrator=ORCHESTRATOR, *args, **kwargs)
+        
+        loremaster_dialogue.append(chatter.getUsrMsg(loremaster_msg[-1]['content']))
         loremaster_dialogue.append(chatter.getAssMsg(loremaster_reply))
 
-        print(color.pgreen(loremaster_reply))
+        #print(color.pgreen(loremaster_reply))
+        chatter.printMessages(loremaster_dialogue)
         input('Continue?')
 
         prompt = None
@@ -517,7 +551,8 @@ def main():
     args = parser.parse_args() 
 
     #noting(**vars(args))
-    orchestrate(**vars(args))
+    #orchestrate(**vars(args))
+    tokenmaster(**vars(args))
 
         
 
