@@ -10,6 +10,7 @@ from colorcodes import Colorcodes
 from pg_vector import grab_k
 from pg_embed import embed 
 from pg_chat import start_chat, connect
+from parsers import parser_gpt, parser_sql 
 
 
 LORE_MASTER = """You are the LORE MASTER.
@@ -35,7 +36,6 @@ USER QUERY: <user query>
 Please use IGOR's summary to accurately answer the USER's query!
 Be thorough and give the user the specific detail they are interested in.   
 And most importantly, be creative and have fun!"""
-
 
 IGOR = """ 
 You are a world-class researcher. 
@@ -91,7 +91,6 @@ REMEMBER to RESEARCH, not WRITE about what you find.
 Please write your summarized notes as a bulleted list. 
 """
 
-
 TOOLMASTER = """You are the TOOL MASTER.
 Your job is to help the GAME MASTER (GM) of a Dungeons and Dragons Campaign by selecting the best tool for the job.
 
@@ -135,7 +134,6 @@ RESPONSE EXAMPLE:
 Now please go about your job. 
 """
 
-
 ORCHESTRATOR = """You are the ORCHESTRATOR. 
 You must determine if a question has been adequately answered. 
 
@@ -149,7 +147,6 @@ If the ANSWER adequately answers the USER QUERY, please write 'adequate'.
 
 Otherwise, if you find the question has not been adequately answered, please return ANY AND ALL criticism as a BULLETED LIST.
 """
-
 
 QUERY_MASTER = """You are the QUERY MASTER. 
 Your job is to improve questions. 
@@ -171,9 +168,15 @@ TOOLS = {'notes':'Notes written by the GAME MASTER (GM) of a dnd campaign. Usefu
          'build a character': 'A small white-page sheet containing 10 steps on how to build a character.'
          }
 
+
+
 def make_parser():
     parser = argparse.ArgumentParser(description="Chat with Yggy")
 
+    parser = parser_gpt(parser)
+    parser = parser_sql(parser)
+
+    return(parser)
 
 def sortXbyY(X, Y):
     return([x for _, x in sorted(zip(Y, X))])
