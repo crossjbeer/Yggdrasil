@@ -21,7 +21,13 @@ The INFORMATION may be accompanied by:
 - Document Description: A short description of the document the INFORMATION was taken from.
 
 Your job is to parse the INFORMATION to find all NAMED ENTITIES. 
+
+In this case, a NAMED ENTITY is a word or phrase that is a name of a PERSON, PLACE, THING, or IDEA.
+We are breaking down manuals and technical documents, so be sure to be thorough. 
+
 You should output your findings as a BULLETED LIST. 
+
+Now please take a deep breath and let's get started! 
 """
 
 DISAMBIGUATOR = """You are the DISAMBIGUATOR.
