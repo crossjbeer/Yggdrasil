@@ -71,6 +71,16 @@ Output your response as a BULLETED LIST, with as many FILES as NAMED ENTITIES.
 """
 
 FORGE_MASTER = """You are the FORGE MASTER. 
+You are an expert researcher and writer. 
+
+You will be provided with a small list of NAMED ENTITIES. 
+You will also be provided with a snippet of INFORMATION.
+You may be provided with a DOCUMENT NAME, the name of the document the INFORMATION was taken from.
+You may also be provided with a DOCUMENT DESCRIPTION, a short description of the document the INFORMATION was taken from.
+
+We want to pull any information related to each entity from the 
+
+Your job is to read through a snippet of INFORMATION. 
 
 """
 
@@ -81,6 +91,9 @@ def make_parser():
     parser.add_argument('--lore_dir_seed', help='Path to the folder where the lore entries will be stored. (Default: ./lore)', default='./lore', type=valid_path_build)
     parser.add_argument('--token_lim', type=int, help='Chunk size the document will be split into. (Default: 1000)', default=1000)
     parser.add_argument('--lag', type=int, help='Number of tokens to lag between chunks. (Default: 0)', default=0)
+
+    parser.add_argument('--doc_name', help='Name of the document to be parsed.', default=None, type=str)
+    parser.add_argument('--doc_desc', help='Description of the document to be parsed.', default=None, type=str)
 
     parser = parser_gpt(parser)
     parser = parser_sql(parser)
@@ -133,6 +146,28 @@ def disambiguator_step(named_entities, lore_entries, chatter, disambiguator_prom
     reply = parse_bulleted_list(reply)
     return(reply)
 
+def forgemaster_step(named_entities, info, chatter, forgemaster_prompt = FORGE_MASTER):
+    """
+    This function performs a single interaction with the FORGE MASTER (FM).
+    We use FM to load the information into the appropriate files. 
+    """
+
+    messages = [chatter.getSysMsg(forgemaster_prompt)]
+
+    prompt = """NAMED ENTITIES:\n{}""".format('\n'.join(named_entities))
+    messages.append(chatter.getUsrMsg(prompt))
+
+    prompt = """Information:\n{}""".format(info)
+    messages.append(chatter.getUsrMsg(prompt))
+
+    chatter.printMessages(messages)
+    input('Continue?') 
+
+    reply = chatter(messages)
+
+    reply = parse_bulleted_list(reply)
+    return(reply)
+
 def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, entitymaster_prompt = ENTITY_MASTER):
     color = cc() 
     existing_lore = os.listdir(lore_dir)
@@ -141,24 +176,15 @@ def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, e
     print(color.pred('Grabbing Entities...'))
     named_entities = entitymaster_step(info, chatter, doc_name=doc_name, doc_desc=doc_desc, entitymaster_prompt=entitymaster_prompt)
 
-    print("Named Entities:")
-    for ne in named_entities:
-        print(ne)
-    print("***************")
-    print() 
-
-    lore_entries = named_entities 
     if(len(existing_lore)):
         # Ask the disambiguator for lore entries for each named entity
         print(color.pred('Disambiguating Entities...')) 
-        lore_entries = disambiguator_step(named_entities, existing_lore, chatter)
-
-        for named_entity, lore_entry in zip(named_entities, lore_entries):
-            print("Named Entity: {}".format(named_entity))
-            print("Lore Entry: {}".format(lore_entry))
-            print("")
+        named_entities = disambiguator_step(named_entities, existing_lore, chatter)
 
         input() 
+
+    for ne in named_entities: 
+        print(ne)
 
     # Use the Forge Master to load the information into the appropriate lore entries. 
     
@@ -193,7 +219,7 @@ def main():
         chunk = script.getText(chunk)
         print(chunk)
 
-        forge_step(chunk, chatter, lore_dir=args.lore_dir, doc_name=args.path.split('/')[-1])
+        forge_step(chunk, chatter, lore_dir = args.lore_dir, **vars(args))
 
 
 
