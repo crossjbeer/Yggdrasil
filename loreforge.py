@@ -153,6 +153,22 @@ def disambiguator_step(named_entities, lore_entries, chatter, disambiguator_prom
     reply = parse_bulleted_list(reply)
     return(reply)
 
+def parse_forgemaster(reply):
+    entity_to_info = {}
+
+    reply = reply.split('\n')
+    for line in reply: 
+        if(line.startswith('Entity:')):
+            entity = line.split('Entity:')[1].strip()
+            entity_to_info[entity] = ''
+
+        elif(line.startswith('Info:') and entity):
+            info = line.split('Info:')[1].strip()
+            entity_to_info[entity] = info
+            entity = None 
+
+    return(entity_to_info)
+
 def forgemaster_step(named_entities, info, chatter, forgemaster_prompt = FORGE_MASTER):
     """
     This function performs a single interaction with the FORGE MASTER (FM).
@@ -175,7 +191,14 @@ def forgemaster_step(named_entities, info, chatter, forgemaster_prompt = FORGE_M
     print(reply)
     input() 
 
-    reply = parse_bulleted_list(reply)
+    reply = parse_forgemaster(reply)
+    for entity in reply:
+        print("Entity: {}".format(entity))
+        print("Info: {}".format(reply[entity]))
+        print()
+    input() 
+
+    #reply = parse_bulleted_list(reply)
     return(reply)
 
 def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, entitymaster_prompt = ENTITY_MASTER, disambiguator_prompt=DISAMBIGUATOR, forgemaster_prompt=FORGE_MASTER, forgemaster_entities=5, *args, **kwargs):
