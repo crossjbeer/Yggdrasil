@@ -613,8 +613,10 @@ def tokenmaster(model, query, nvector, embedder, loremaster=LORE_MASTER, igor=IG
 
 
 def main():
-    #parser = make_parser_gpt_sql()
+    parser = make_parser()
     args = parser.parse_args() 
+
+    
 
     #noting(**vars(args))
     #orchestrate(**vars(args))
