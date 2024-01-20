@@ -351,7 +351,11 @@ def ask_igor(prompt, embedder='text-embedding-ada-002', model='gpt-3.5-turbo', n
     igor_msg.append(chatter.getUsrMsg('USER QUERY: {}'.format(prompt)))
 
     if(verbose):
-        print(color.pbold(color.pred('\tSummarizing with IGOR...')))
+        if(namespace):
+            print(color.pred(f'\tSummarizing {namespace} with IGOR...'))
+        else:
+            print(color.pbold(color.pred('\tSummarizing with IGOR...')))
+
     igor_reply = chatter.passMessagesGetReply(igor_msg)
 
     return(igor_reply)
@@ -367,15 +371,13 @@ def ask_igor_small(prompt, igor_notes, chatter=None, model='gpt-3.5-turbo', igor
 
     igor_msg.append(chatter.getUsrMsg('USER QUERY: {}'.format(prompt)))
 
-    if(verbose):
-        color = Colorcodes()
-        print(color.pbold(color.pred('\tSummarizing with IGOR...')))
-        #chatter.printMessages(igor_msg)
+    #if(verbose):
+    #    color = Colorcodes()
+    #    print(color.pbold(color.pred('\tSummarizing with IGOR...')))
 
     igor_reply = chatter.passMessagesGetReply(igor_msg)
 
     return(igor_reply)
-
 
 def ask_loremaster(prompt, igor_reply, chatter, messages=[], loremaster_prompt = LORE_MASTER, verbose=False):
     if(not len(messages)):
@@ -528,12 +530,15 @@ def tokenmaster_step(prompt, model, chatter, embedder, verbose, total_tokens = 5
     for i, sortkey in enumerate(sorted_keys):
         if(tm_reply[sortkey] == 0):
             continue
+
         print(color.pgreen(f"\t\tTool {i+1}: {sortkey} [{tm_reply[sortkey]} Tokens]"))
 
     for i, sortkey in enumerate(sorted_keys):
         note_vector = info_grab(prompt, tm_reply[sortkey], embedder, namespace=sortkey, *args, **kwargs)
-        #igor_notes = organize_notes_from_vectors(note_vector)
         igor_info = organize_information_from_vectors(note_vector, knowledge_source=sortkey, knowledge_source_description=tools[sortkey])
+
+        if(verbose):
+            print(color.pred(f"\t\tSummarizing {sortkey} with IGOR..."))
 
         igor_summary = ask_igor_small(prompt, igor_info, chatter, model, igor, verbose=verbose)
         igor_summaries[sortkey] = igor_summary
@@ -542,8 +547,7 @@ def tokenmaster_step(prompt, model, chatter, embedder, verbose, total_tokens = 5
     for note in igor_summaries: 
         full_igor_summary += f"Knowledge Source: {note}\nSource Description: {tools[note]}\n\nIgor Summary:\n{igor_summaries[note]}\n\n"
 
-    print("Full Igor Summary:\n", full_igor_summary)
-
+    #print("Full Igor Summary:\n", full_igor_summary)
     loremaster_reply, loremaster_msg = ask_loremaster(prompt, full_igor_summary, chatter, messages=loremaster_dialogue, verbose=verbose, loremaster_prompt=loremaster)
 
     return(loremaster_reply, loremaster_msg)
@@ -585,11 +589,13 @@ def tokenmaster(model, query, nvector, embedder, loremaster=LORE_MASTER, igor=IG
     Then, we will give all the information gathered to one or more Igor's to summarize. Once this is done, we pass to Lore Master and get whatever we get. 
     We eliminate the Orchestration Step alltogether.  
     """
+    print("\n"*10)
 
     color = Colorcodes()
     chatter = Chatter(model)
 
-    print(color.pbold(f'~~ Chatting with {model} ~~'))
+    if(verbose):
+        print(color.pbold(f'~~ Chatting with {model} ~~'))
 
     loremaster_dialogue = [] 
     loremaster_dialogue.append(chatter.getSysMsg(loremaster))
@@ -600,7 +606,11 @@ def tokenmaster(model, query, nvector, embedder, loremaster=LORE_MASTER, igor=IG
             prompt = chatter.usrprompt()
 
         qm_reply = ask_querymaster(prompt, chatter, querymaster_prompt=QUERY_MASTER, verbose=verbose)
-        print(qm_reply)
+
+        if(verbose):
+            print(color.pgreen(f"\tOriginal Prompt:\n- {prompt}"))
+            print(color.pbold(color.pgreen(f"\tImproved Prompt:\n- {qm_reply}")))
+
         prompt = qm_reply 
 
         loremaster_reply, _ = tokenmaster_step(prompt, model, chatter, embedder, verbose, total_tokens=nvector, toolmaster=toolmaster, igor=igor, loremaster=loremaster, loremaster_dialogue=loremaster_dialogue, *args, **kwargs)
