@@ -32,7 +32,7 @@ You should output your findings as a BULLETED LIST.
 Now please take a deep breath and let's get started! 
 """
 
-DISAMBIGUATOR = """You are the DISAMBIGUATOR.
+DISAMBIGUATOR_OLD = """You are the DISAMBIGUATOR.
 Your job is to disambiguate NAMED ENTITIES against a given list of LORE ENTRIES. 
 
 NAMED ENTITIES are entities that have been identitied from a snippet of INFORMATION. 
@@ -50,6 +50,24 @@ They should use underscores instead of spaces. They should be all lowercase.
 
 For each NAMED ENTITY provided, provide a LORE ENTRY. 
 Output your response as a BULLETED LIST, where each bullet point is a LORE ENTRY.
+"""
+
+DISAMBIGUATOR = """You are the DISAMBIGUATOR.
+Your job is to place NAMED ENTITIES into appropriate FILES. 
+
+NAMED ENTITIES are entities identitied from a snippet of INFORMATION. 
+You may be provided with a DOCUMENT NAME, the name of the document the INFORMATION was taken from.
+You may also be provided with a DOCUMENT DESCRIPTION, a short description of the document the INFORMATION was taken from.
+
+Each FILE in FILES is a .txt document defining information about a NAMED ENTITY.
+For instance, dogs.txt may contain any information found from the DOCUMENT related to dogs. 
+
+You should decide to which FILE each NAMED ENTITY should be assigned. 
+If no appropriate FILE exists, you should create a new one.
+FILES all end with .txt. They should use underscores instead of spaces. They should be all lowercase. 
+
+For each NAMED ENTITY, assign a FILE.  
+Output your response as a BULLETED LIST, with as many FILES as NAMED ENTITIES. 
 """
 
 FORGE_MASTER = """You are the FORGE MASTER. 
@@ -129,16 +147,21 @@ def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, e
     print("***************")
     print() 
 
-    # Ask the disambiguator for lore entries for each named entity
-    print(color.pred('Disambiguating Entities...')) 
-    lore_entries = disambiguator_step(named_entities, existing_lore, chatter)
+    lore_entries = named_entities 
+    if(len(existing_lore)):
+        # Ask the disambiguator for lore entries for each named entity
+        print(color.pred('Disambiguating Entities...')) 
+        lore_entries = disambiguator_step(named_entities, existing_lore, chatter)
 
-    for named_entity, lore_entry in zip(named_entities, lore_entries):
-        print("Named Entity: {}".format(named_entity))
-        print("Lore Entry: {}".format(lore_entry))
-        print("")
+        for named_entity, lore_entry in zip(named_entities, lore_entries):
+            print("Named Entity: {}".format(named_entity))
+            print("Lore Entry: {}".format(lore_entry))
+            print("")
 
-    input() 
+        input() 
+
+    # Use the Forge Master to load the information into the appropriate lore entries. 
+    
 
 
 def build_lore_dir(args):
