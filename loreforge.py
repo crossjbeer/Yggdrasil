@@ -151,6 +151,9 @@ def disambiguator_step(named_entities, lore_entries, chatter, disambiguator_prom
     #input("DIS REPLY ^^")
 
     reply = parse_bulleted_list(reply)
+
+    reply = [i.split('.')[0] if i.endswith('.txt') else i for i in reply]
+
     return(reply)
 
 def parse_forgemaster(reply):
