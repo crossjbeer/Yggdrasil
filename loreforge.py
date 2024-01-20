@@ -38,6 +38,7 @@ LORE ENTRIES are .txt documents stored locally.
 You should decide to which LORE ENTRY each NAMED ENTITY should be assigned. 
 If no appropriate LORE ENTRY exists, you should create a new one.
 LORE ENTRIES all end with .txt. They should be short and descriptive of the LORE. 
+They should use underscores instead of spaces. They should be all lowercase. 
 
 For each NAMED ENTITY provided, provide a LORE ENTRY. 
 Output your response as a BULLETED LIST, where each bullet point is a LORE ENTRY.
