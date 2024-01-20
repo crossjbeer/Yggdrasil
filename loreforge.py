@@ -79,10 +79,12 @@ You will also be provided with a snippet of INFORMATION.
 You may be provided with a DOCUMENT NAME, the name of the document the INFORMATION was taken from.
 You may also be provided with a DOCUMENT DESCRIPTION, a short description of the document the INFORMATION was taken from.
 
-We want to pull any information related to each entity from the 
+We want to pull any information related to each entity from the list.
+Your job is to read through a snippet of INFORMATION and write an entry for each NAMED ENTITY. 
 
-Your job is to read through a snippet of INFORMATION. 
-
+For each entity, please output your response as follows: 
+- Entity: <ENTITY>
+- Info: <INFO>
 """
 
 def make_parser():
@@ -162,13 +164,16 @@ def forgemaster_step(named_entities, info, chatter, forgemaster_prompt = FORGE_M
     prompt = """NAMED ENTITIES:\n{}""".format('\n'.join(named_entities))
     messages.append(chatter.getUsrMsg(prompt))
 
-    prompt = """Information:\n{}""".format(info)
+    prompt = """INFORMATION:\n{}""".format(info)
     messages.append(chatter.getUsrMsg(prompt))
 
     chatter.printMessages(messages)
     input('Continue?') 
 
     reply = chatter(messages)
+
+    print(reply)
+    input() 
 
     reply = parse_bulleted_list(reply)
     return(reply)
@@ -197,12 +202,6 @@ def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, e
         if(ne not in existing_lore):
             with open(pth, 'w') as f:
                 f.write('# File to store information about [{}]\n'.format(ne))
-
-    #print("NAMED ENTITIES:")
-    #for ne in named_entities: 
-    #    print(ne)
-    #print("************")
-    #input () 
 
     # Use the Forge Master to load the information into the appropriate lore entries. 
     for i in range(0, len(named_entities), forgemaster_entities):
