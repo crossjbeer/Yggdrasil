@@ -214,7 +214,7 @@ def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, e
         print(color.pred('Disambiguating Entities...')) 
         named_entities = disambiguator_step(named_entities, existing_lore, chatter, disambiguator_prompt=disambiguator_prompt)
 
-        input() 
+        #input() 
 
     print("Named Entities:")
     for ne in named_entities: 
