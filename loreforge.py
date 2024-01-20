@@ -110,6 +110,12 @@ def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, e
     # Ask the entity master for named entities in the given information
     named_entities = entitymaster_step(info, chatter, doc_name=doc_name, doc_desc=doc_desc, entitymaster_prompt=entitymaster_prompt)
 
+    print("Named Entities:")
+    for ne in named_entities:
+        print(ne)
+    print("***************")
+    print() 
+
     # Ask the disambiguator for lore entries for each named entity
     lore_entries = disambiguator_step(named_entities, existing_lore, chatter)
 
