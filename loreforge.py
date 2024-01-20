@@ -99,7 +99,6 @@ def disambiguator_step(named_entities, lore_entries, chatter, disambiguator_prom
     We return these lore entries as a list. 
     """
 
-    color = cc() 
     messages = [chatter.getSysMsg(disambiguator_prompt)]
 
     prompt = """NAMED ENTITIES:\n{}""".format('\n'.join(named_entities))
@@ -108,15 +107,20 @@ def disambiguator_step(named_entities, lore_entries, chatter, disambiguator_prom
     prompt = """LORE ENTRIES:\n{}""".format('\n'.join(lore_entries))
     messages.append(chatter.getUsrMsg(prompt))
 
+    chatter.printMessages(messages)
+    input('Continue?') 
+
     reply = chatter(messages)
 
     reply = parse_bulleted_list(reply)
     return(reply)
 
 def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, entitymaster_prompt = ENTITY_MASTER):
+    color = cc() 
     existing_lore = os.listdir(lore_dir)
 
     # Ask the entity master for named entities in the given information
+    print(color.pred('Grabbing Entities...'))
     named_entities = entitymaster_step(info, chatter, doc_name=doc_name, doc_desc=doc_desc, entitymaster_prompt=entitymaster_prompt)
 
     print("Named Entities:")
@@ -126,6 +130,7 @@ def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, e
     print() 
 
     # Ask the disambiguator for lore entries for each named entity
+    print(color.pred('Disambiguating Entities...')) 
     lore_entries = disambiguator_step(named_entities, existing_lore, chatter)
 
     for named_entity, lore_entry in zip(named_entities, lore_entries):
@@ -154,6 +159,7 @@ def main():
     args = parser.parse_args()
 
     args.lore_dir = build_lore_dir(args)
+    print("Lore Dir: {}".format(args.lore_dir))
     
     script = Scripter()
     df = script.loadTxt(args.path)
@@ -161,7 +167,6 @@ def main():
 
     chatter = Chatter(args.model)
     for chunk in token_chunks: 
-        print(chunk)
         chunk = script.getText(chunk)
         print(chunk)
 
