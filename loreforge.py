@@ -125,7 +125,7 @@ def entitymaster_step(info, chatter, doc_name=None, doc_desc=None, entitymaster_
     messages.append(chatter.getUsrMsg(prompt))
     reply = chatter(messages)
     print(reply)
-    input("EM REPLY ^^")
+    #input("EM REPLY ^^")
 
     reply = parse_bulleted_list(reply)
     return(reply)
@@ -148,7 +148,7 @@ def disambiguator_step(named_entities, lore_entries, chatter, disambiguator_prom
     reply = chatter(messages)
 
     print(reply)
-    input("DIS REPLY ^^")
+    #input("DIS REPLY ^^")
 
     reply = parse_bulleted_list(reply)
     return(reply)
@@ -190,7 +190,7 @@ def forgemaster_step(named_entities, info, chatter, forgemaster_prompt = FORGE_M
         print("Entity: {}".format(entity))
         print("Info: {}".format(reply[entity]))
         print()
-    input() 
+    #input() 
 
     #reply = parse_bulleted_list(reply)
     return(reply)
@@ -276,7 +276,7 @@ def main():
         print("CHUNK ***")
         print(chunk)
         print("************")
-        input() 
+        #input() 
 
         forge_step(chunk, chatter, **vars(args))
 
