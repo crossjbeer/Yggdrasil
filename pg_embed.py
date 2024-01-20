@@ -5,15 +5,15 @@ import numpy as np
 from pgvector.psycopg2 import register_vector
 
 from scripter import Scripter
-from parsers import make_parser_sql
+#from parsers import make_parser_sql
+from parsers import parser_sql
 from pg_chat import connect
 
 def make_parser():
     # Create an argument parser
     parser = argparse.ArgumentParser(description='Embed a note')
 
-    parser = make_parser_sql()
-    parser.description = 'Embed a Note'
+    #parser = make_parser_sql()
 
     parser.add_argument("-p", '--path', help='Path to .txt to embed', default='', required=False)
     parser.add_argument('--startingline', help='Line to start', default=0)
@@ -24,6 +24,8 @@ def make_parser():
     parser.add_argument('--halt', action="store_true", help='Will pause before sending each prompt')
     parser.add_argument('--lag', default=0, help='Lag between token chunks', type=int)
     parser.add_argument("--namespace", default='note', help='Namespace for embedding', type=str)
+
+    parser = parser_sql(parser)
 
     return(parser)
 
