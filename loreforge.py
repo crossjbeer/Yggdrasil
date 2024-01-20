@@ -24,10 +24,11 @@ Your job is to parse the INFORMATION to find all NAMED ENTITIES.
 
 In this case, a NAMED ENTITY is a word or phrase that is a name of a PERSON, PLACE, THING, or IDEA.
 We are breaking down manuals and technical documents, so be sure to be thorough. 
-Also know that the INFORMATION may be poorly formatted, due to errors in the OCR process.
+Also know that the INFORMATION may be poorly formatted. Most commonly, words have spaces where there shouldn't be. 
 Please do your best to clean up the info where possible. 
 
 You should output your findings as a BULLETED LIST. 
+Each named entity should be lowercase and use underscores instead of spaces.
 
 Now please take a deep breath and let's get started! 
 """
