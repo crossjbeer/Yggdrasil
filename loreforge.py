@@ -219,7 +219,7 @@ def main():
         chunk = script.getText(chunk)
         print(chunk)
 
-        forge_step(chunk, chatter, lore_dir = args.lore_dir, **vars(args))
+        forge_step(chunk, chatter, **vars(args))
 
 
 
