@@ -69,7 +69,7 @@ def entitymaster_step(info, chatter, doc_name=None, doc_desc=None, entitymaster_
         prompt += """\nDocument Description: {}""".format(doc_desc)
 
     messages.append(chatter.getUsrMsg(prompt))
-    reply = chatter(reply)
+    reply = chatter(messages)
 
     reply = parse_bulleted_list(reply)
     return(reply)
@@ -139,6 +139,7 @@ def main():
     for chunk in token_chunks: 
         print(chunk)
         chunk = script.getText(chunk)
+        print(chunk)
 
         forge_step(chunk, chatter, lore_dir=args.lore_dir, doc_name=args.path.split('/')[-1])
 
