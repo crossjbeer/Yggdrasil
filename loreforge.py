@@ -90,7 +90,7 @@ def disambiguator_step(named_entities, lore_entries, chatter, disambiguator_prom
     prompt = """LORE ENTRIES:\n{}""".format('\n'.join(lore_entries))
     messages.append(chatter.getUsrMsg(prompt))
 
-    reply = chatter(reply)
+    reply = chatter(messages)
 
     reply = parse_bulleted_list(reply)
     return(reply)
