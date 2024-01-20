@@ -187,11 +187,14 @@ def forgemaster_step(named_entities, info, chatter, forgemaster_prompt = FORGE_M
 
     reply = chatter(messages)
 
+    print(reply)
+
     reply = parse_forgemaster(reply)
     for entity in reply:
         print("Entity: {}".format(entity))
         print("Info: {}".format(reply[entity]))
         print()
+
     #input() 
 
     #reply = parse_bulleted_list(reply)
