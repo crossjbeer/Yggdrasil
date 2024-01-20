@@ -168,7 +168,7 @@ def forgemaster_step(named_entities, info, chatter, forgemaster_prompt = FORGE_M
     reply = parse_bulleted_list(reply)
     return(reply)
 
-def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, entitymaster_prompt = ENTITY_MASTER, *args, **kwargs):
+def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, entitymaster_prompt = ENTITY_MASTER, disambiguator_prompt=DISAMBIGUATOR, forgemaster_prompt=FORGE_MASTER, *args, **kwargs):
     color = cc() 
     existing_lore = os.listdir(lore_dir)
 
@@ -179,14 +179,26 @@ def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, e
     if(len(existing_lore)):
         # Ask the disambiguator for lore entries for each named entity
         print(color.pred('Disambiguating Entities...')) 
-        named_entities = disambiguator_step(named_entities, existing_lore, chatter)
+        named_entities = disambiguator_step(named_entities, existing_lore, chatter, disambiguator_prompt=disambiguator_prompt)
 
         input() 
 
+    print("NAMED ENTITIES:")
     for ne in named_entities: 
         print(ne)
+    print("************")
+    input () 
 
     # Use the Forge Master to load the information into the appropriate lore entries. 
+    for i in range(0, len(named_entities), 3):
+        current_entites = named_entities[i:min(i+3, len(named_entities)-1)]
+
+        print("CURRENT ENTITIES:")
+        print(current_entites)
+
+        forgemaster_step(current_entites, info, chatter, forgemaster_prompt=forgemaster_prompt)
+
+
     
 
 
@@ -217,7 +229,10 @@ def main():
     chatter = Chatter(args.model)
     for chunk in token_chunks: 
         chunk = script.getText(chunk)
+        print("CHUNK ***")
         print(chunk)
+        print("************")
+        input() 
 
         forge_step(chunk, chatter, **vars(args))
 
