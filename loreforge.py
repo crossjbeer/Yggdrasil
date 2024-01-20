@@ -41,7 +41,7 @@ FORGE_MASTER = """You are the FORGE MASTER.
 def make_parser():
     parser = argparse.ArgumentParser(description="Loreforge: A tool for generating lore entries for named entities in documents.")
 
-    parser.add_argument('-p', '--path', type=str, help='Path to the document to be parsed.', required=True, type=valid_path)
+    parser.add_argument('-p', '--path', help='Path to the document to be parsed.', required=True, type=valid_path)
     parser.add_argument('--lore_dir_seed', type=str, help='Path to the folder where the lore entries will be stored. (Default: ./lore)', default='./lore', type=valid_path_build)
     parser.add_argument('--token_lim', type=int, help='Chunk size the document will be split into. (Default: 1000)', default=1000)
     parser.add_argument('--lag', type=int, help='Number of tokens to lag between chunks. (Default: 0)', default=0)
