@@ -95,6 +95,8 @@ def make_parser():
     parser.add_argument('--doc_name', help='Name of the document to be parsed.', default=None, type=str)
     parser.add_argument('--doc_desc', help='Description of the document to be parsed.', default=None, type=str)
 
+    parser.add_argument('--delete_lore', help='Delete existing lore entires', action='store_true')
+
     parser = parser_gpt(parser)
     parser = parser_sql(parser)
 
@@ -170,7 +172,7 @@ def forgemaster_step(named_entities, info, chatter, forgemaster_prompt = FORGE_M
     reply = parse_bulleted_list(reply)
     return(reply)
 
-def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, entitymaster_prompt = ENTITY_MASTER, disambiguator_prompt=DISAMBIGUATOR, forgemaster_prompt=FORGE_MASTER, *args, **kwargs):
+def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, entitymaster_prompt = ENTITY_MASTER, disambiguator_prompt=DISAMBIGUATOR, forgemaster_prompt=FORGE_MASTER, forgemaster_entities=5, *args, **kwargs):
     color = cc() 
     existing_lore = os.listdir(lore_dir)
 
@@ -179,21 +181,31 @@ def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, e
     named_entities = entitymaster_step(info, chatter, doc_name=doc_name, doc_desc=doc_desc, entitymaster_prompt=entitymaster_prompt)
 
     if(len(existing_lore)):
+        existing_lore = [i for i in existing_lore if i.endswith('.txt')]
+        existing_lore = [i.split('.')[0] for i in existing_lore]
+
         # Ask the disambiguator for lore entries for each named entity
         print(color.pred('Disambiguating Entities...')) 
         named_entities = disambiguator_step(named_entities, existing_lore, chatter, disambiguator_prompt=disambiguator_prompt)
 
         input() 
 
-    print("NAMED ENTITIES:")
     for ne in named_entities: 
-        print(ne)
-    print("************")
-    input () 
+        pth = os.path.join(lore_dir, ne+'.txt')
+
+        if(ne not in existing_lore):
+            with open(pth, 'w') as f:
+                f.write('# File to store information about [{}]\n'.format(ne))
+
+    #print("NAMED ENTITIES:")
+    #for ne in named_entities: 
+    #    print(ne)
+    #print("************")
+    #input () 
 
     # Use the Forge Master to load the information into the appropriate lore entries. 
-    for i in range(0, len(named_entities), 3):
-        current_entites = named_entities[i:min(i+3, len(named_entities)-1)]
+    for i in range(0, len(named_entities), forgemaster_entities):
+        current_entites = named_entities[i:min(i+forgemaster_entities, len(named_entities)-1)]
 
         print("CURRENT ENTITIES:")
         print(current_entites)
@@ -223,6 +235,11 @@ def main():
 
     args.lore_dir = build_lore_dir(args)
     print("Lore Dir: {}".format(args.lore_dir))
+
+    if(args.delete_lore):
+        print("Deleting existing lore...")
+        for f in os.listdir(args.lore_dir):
+            os.remove(os.path.join(args.lore_dir, f)) if f.endswith('.txt') else None
     
     script = Scripter()
     df = script.loadTxt(args.path)
