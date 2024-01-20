@@ -119,6 +119,8 @@ def entitymaster_step(info, chatter, doc_name=None, doc_desc=None, entitymaster_
 
     messages.append(chatter.getUsrMsg(prompt))
     reply = chatter(messages)
+    print(reply)
+    input("EM REPLY ^^")
 
     reply = parse_bulleted_list(reply)
     return(reply)
@@ -138,10 +140,10 @@ def disambiguator_step(named_entities, lore_entries, chatter, disambiguator_prom
     prompt = """LORE ENTRIES:\n{}""".format('\n'.join(lore_entries))
     messages.append(chatter.getUsrMsg(prompt))
 
-    chatter.printMessages(messages)
-    input('Continue?') 
-
     reply = chatter(messages)
+
+    print(reply)
+    input("DIS REPLY ^^")
 
     reply = parse_bulleted_list(reply)
     return(reply)
