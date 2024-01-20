@@ -183,13 +183,7 @@ def forgemaster_step(named_entities, info, chatter, forgemaster_prompt = FORGE_M
     prompt = """INFORMATION:\n{}""".format(info)
     messages.append(chatter.getUsrMsg(prompt))
 
-    chatter.printMessages(messages)
-    input('Continue?') 
-
     reply = chatter(messages)
-
-    print(reply)
-    input() 
 
     reply = parse_forgemaster(reply)
     for entity in reply:
@@ -233,7 +227,15 @@ def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, e
         print("CURRENT ENTITIES:")
         print(current_entites)
 
-        forgemaster_step(current_entites, info, chatter, forgemaster_prompt=forgemaster_prompt)
+        entity_to_info = forgemaster_step(current_entites, info, chatter, forgemaster_prompt=forgemaster_prompt)
+
+        for entity, info in entity_to_info.items():
+            pth = os.path.join(lore_dir, entity+'.txt')
+
+            with open(pth, 'a') as f:
+                f.write('\n'+info)
+
+        
 
 
     
