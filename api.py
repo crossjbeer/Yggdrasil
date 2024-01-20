@@ -167,7 +167,6 @@ def yggy():
 app.register_blueprint(chat_blueprint)
 app.register_blueprint(noting_blueprint)
 if __name__ == '__main__':
-    #parser = make_parser_gpt_sql()
     paresr = make_parser()
     args = parser.parse_args()
 

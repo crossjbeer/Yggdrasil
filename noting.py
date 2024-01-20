@@ -149,17 +149,21 @@ Otherwise, if you find the question has not been adequately answered, please ret
 """
 
 QUERY_MASTER = """You are the QUERY MASTER. 
-Your job is to improve questions. 
+You will be provided with a USER QUERY.
+The USER QUERY will be turned into a vector embedding, and used to search.
 
-You will be provided with some USER QUERY. This is some question or prompt. It is typically related to a DND Campaign. 
-The USER QUERY will eventually be turned into a vector embedding, which we will use to search. 
-Please improve the USER QUERY by adding any information you think will help the vector embedding.
-DO NOT editoralize the USER QUERY. 
-DO NOT imagine information that isn't explicitly stated. 
-DO NOT add your own opinions.
-DO NOT assume. 
+Please augment the USER QUERY by adding any information you think will help the vector embedding.
+This includes: 
+- alternative forms of asking the question
+- adding more descriptive words to the question
+- adding appropriate context 
 
-Please return your improved USER QUERY and nothing else. 
+Below are your requirements: 
+- Return the IMPROVED QUERY and NOTHING ELSE. 
+- DO NOT editoralize the USER QUERY. 
+- DO NOT imagine information that isn't explicitly stated. 
+- DO NOT add your own opinions.
+- DO NOT assume. 
 """
 
 TOOLS = {'notes':'Notes written by the GAME MASTER (GM) of a dnd campaign. Useful for specific world information, NPCs, lore, etc. Not useful for rules. This should likely be referenced in most cases.', 
@@ -266,7 +270,6 @@ def ask_querymaster(prompt, chatter, querymaster_prompt=QUERY_MASTER, verbose=Fa
 
     if(verbose):
         print(color.pbold(color.pred('\tPassing to QUERY MASTER...')))
-        #chatter.printMessages(qm_msg)
 
     qm_reply = chatter.passMessagesGetReply(qm_msg)
 
@@ -615,8 +618,6 @@ def tokenmaster(model, query, nvector, embedder, loremaster=LORE_MASTER, igor=IG
 def main():
     parser = make_parser()
     args = parser.parse_args() 
-
-    
 
     #noting(**vars(args))
     #orchestrate(**vars(args))
