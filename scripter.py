@@ -132,7 +132,7 @@ NAMEDICT = {
 
 
 class Scripter:
-    def __init__(self):
+    def __init__(self, no_tokenizer_autoload=False, default_embedder='ada-002'):
         self.csv_path = "" 
         self.txt_path = ""
 
@@ -145,6 +145,9 @@ class Scripter:
 
         self.model = None 
         self.tizer = None 
+
+        if(not no_tokenizer_autoload):
+            self.loadTokenizer(default_embedder)
 
     def loadTokenizer(self, model):
         self.model = model
@@ -321,26 +324,19 @@ class Scripter:
         - token_bounds (list): A list of tuples representing the token chunk boundaries
         """
 
-        # Initialize variables
         cumulative_tokens = 0
-        token_bounds = []
         current_bound_start = 0
+        token_bounds = []
 
         # Iterate through each row in the dataframe
         for i, row in df.iterrows():
             # Calculate tokens for the current row
             line_tokens = self.calcTokens(row['text'])
 
-            #print("Tokens: {} | {}".format(line_tokens, cumulative_tokens + line_tokens))
-
             # Check if adding line_tokens exceeds the token limit
             if cumulative_tokens + line_tokens > tokenCost:
                 # Note the token bound when the limit is exceeded
                 token_bounds.append((max(0, current_bound_start-lag), i))
-                
-                # Reset cumulative_tokens and update the bound start index
-                #cumulative_tokens = 0
-                #current_bound_start = i + 1
 
                 cumulative_tokens = line_tokens 
                 current_bound_start = i 
@@ -362,7 +358,6 @@ class Scripter:
             chunks.append(self.getDFRows(df, i, j-i, cols))
 
         return(chunks)
-    
 
 
     def combineRowList(self, row_list, name_dict={}):
