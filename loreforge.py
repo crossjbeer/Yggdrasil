@@ -138,6 +138,7 @@ def main():
     chatter = Chatter(args.model)
     for chunk in token_chunks: 
         print(chunk)
+        chunk = script.getText(chunk)
 
         forge_step(chunk, chatter, lore_dir=args.lore_dir, doc_name=args.path.split('/')[-1])
 
