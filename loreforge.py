@@ -79,10 +79,13 @@ You will also be provided with a snippet of INFORMATION.
 You may be provided with a DOCUMENT NAME, the name of the document the INFORMATION was taken from.
 You may also be provided with a DOCUMENT DESCRIPTION, a short description of the document the INFORMATION was taken from.
 
-We want to pull any information related to each entity from the list.
-Your job is to read through a snippet of INFORMATION and write an entry for each NAMED ENTITY. 
+You should find any information related to each entity from the list.
+For each NAMED ENTITY, read through the INFORMATION. Find any information related to the NAMED ENTITY.
+If none is found, do not write anything for that entry. 
 
-For each entity, please output your response as follows: 
+If information is found, condense the relevant information. 
+Be sure to be thorough. 
+Output your response as follows: 
 - Entity: <ENTITY>
 - Info: <INFO>
 """
