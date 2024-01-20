@@ -168,7 +168,7 @@ def forgemaster_step(named_entities, info, chatter, forgemaster_prompt = FORGE_M
     reply = parse_bulleted_list(reply)
     return(reply)
 
-def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, entitymaster_prompt = ENTITY_MASTER):
+def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, entitymaster_prompt = ENTITY_MASTER, *args, **kwargs):
     color = cc() 
     existing_lore = os.listdir(lore_dir)
 
