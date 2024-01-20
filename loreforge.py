@@ -114,12 +114,12 @@ def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, e
 
 def build_lore_dir(args):
     lore_dir = os.path.join(args.lore_dir_seed, args.path.split('/')[-1])
-    if(not os.path.exists(args.lore_dir)):
+    if(not os.path.exists(lore_dir)):
         try:
-            os.makedirs(args.lore_dir)
+            os.makedirs(lore_dir)
         except Exception as e:
             print(e)
-            print("Failed to create lore directory at {}".format(args.lore_dir))
+            print("Failed to create lore directory at {}".format(lore_dir))
             exit(1)
 
     return(lore_dir)
