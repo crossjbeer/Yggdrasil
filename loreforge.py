@@ -27,8 +27,17 @@ You should output your findings as a BULLETED LIST.
 DISAMBIGUATOR = """You are the DISAMBIGUATOR.
 Your job is to disambiguate NAMED ENTITIES against a given list of LORE ENTRIES. 
 
+NAMED ENTITIES are entities that have been identitied from a snippet of INFORMATION. 
+You may be provided with a DOCUMENT NAME, the name of the document the INFORMATION was taken from.
+You may also be provided with a DOCUMENT DESCRIPTION, a short description of the document the INFORMATION was taken from.
+
+LORE ENTRIES is a list of existing NAMED ENTITIES. 
+The name of the LORE ENTRY describes the LORE contained in the file.
+LORE ENTRIES are .txt documents stored locally. 
+
 You should decide to which LORE ENTRY each NAMED ENTITY should be assigned. 
 If no appropriate LORE ENTRY exists, you should create a new one.
+LORE ENTRIES all end with .txt. They should be short and descriptive of the LORE. 
 
 For each NAMED ENTITY provided, provide a LORE ENTRY. 
 Output your response as a BULLETED LIST, where each bullet point is a LORE ENTRY.
