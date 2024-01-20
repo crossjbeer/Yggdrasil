@@ -149,21 +149,25 @@ Otherwise, if you find the question has not been adequately answered, please ret
 """
 
 QUERY_MASTER = """You are the QUERY MASTER. 
-You will be provided with a USER QUERY.
-The USER QUERY will be turned into a vector embedding, and used to search.
+Your job is to improve queries. 
 
-Please augment the USER QUERY by adding any information you think will help the vector embedding.
-This includes: 
+You will be provided with a USER QUERY.
+This will be turned into a vector embedding. 
+Embedding are improved by adding more context, information, and detail.
+
+Please augment the USER QUERY by adding:
 - alternative forms of asking the question
-- adding more descriptive words to the question
-- adding appropriate context 
+- more descriptive words to the question
+- appropriate context 
 
 Below are your requirements: 
 - Return the IMPROVED QUERY and NOTHING ELSE. 
-- DO NOT editoralize the USER QUERY. 
-- DO NOT imagine information that isn't explicitly stated. 
-- DO NOT add your own opinions.
+- DO NOT editoralize.
+- DO NOT imagine or hallucinate.
 - DO NOT assume. 
+
+Remember, you should add detail where possible, instead of removing detail.
+Feel free to return multiple forms of the same question. 
 """
 
 TOOLS = {'notes':'Notes written by the GAME MASTER (GM) of a dnd campaign. Useful for specific world information, NPCs, lore, etc. Not useful for rules. This should likely be referenced in most cases.', 
@@ -589,7 +593,6 @@ def tokenmaster(model, query, nvector, embedder, loremaster=LORE_MASTER, igor=IG
     Then, we will give all the information gathered to one or more Igor's to summarize. Once this is done, we pass to Lore Master and get whatever we get. 
     We eliminate the Orchestration Step alltogether.  
     """
-    print("\n"*10)
 
     color = Colorcodes()
     chatter = Chatter(model)
@@ -624,10 +627,31 @@ def tokenmaster(model, query, nvector, embedder, loremaster=LORE_MASTER, igor=IG
     return() 
 
 
+def yggy_print():
+    color = Colorcodes()
+
+    s = """                   _,---.       _,---.                
+ ,--.-.  .-,--._.='.'-,  \  _.='.'-,  \,--.-.  .-,--. 
+/==/- / /=/_ //==.'-     / /==.'-     /==/- / /=/_ /  
+\==\, \/=/. //==/ -   .-' /==/ -   .-'\==\, \/=/. /   
+ \==\  \/ -/ |==|_   /_,-.|==|_   /_,-.\==\  \/ -/    
+  |==|  ,_/  |==|  , \_.' )==|  , \_.' )|==|  ,_/     
+  \==\-, /   \==\-  ,    (\==\-  ,    ( \==\-, /      
+  /==/._/     /==/ _  ,  / /==/ _  ,  / /==/._/       
+  `--`-`      `--`------'  `--`------'  `--`-`        
+"""
+
+    print("\n"*10)
+    print(color.porange(s))
+
+    return() 
+
 
 def main():
     parser = make_parser()
     args = parser.parse_args() 
+
+    yggy_print()
 
     #noting(**vars(args))
     #orchestrate(**vars(args))
