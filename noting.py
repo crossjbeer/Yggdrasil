@@ -169,6 +169,8 @@ TOOLS = {'notes':'Notes written by the GAME MASTER (GM) of a dnd campaign. Usefu
 
 def organize_notes_from_vectors(vectors):
     unique_notes = np.unique(vectors['note'])
+    print("Unique Notes: {}".format(unique_notes))
+    input()
 
     notes = {}
     for note in unique_notes:
