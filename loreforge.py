@@ -188,6 +188,7 @@ def forgemaster_step(named_entities, info, chatter, forgemaster_prompt = FORGE_M
     reply = chatter(messages)
 
     print(reply)
+    print("FM REPLY ^^")
 
     reply = parse_forgemaster(reply)
     for entity in reply:
@@ -195,9 +196,6 @@ def forgemaster_step(named_entities, info, chatter, forgemaster_prompt = FORGE_M
         print("Info: {}".format(reply[entity]))
         print()
 
-    #input() 
-
-    #reply = parse_bulleted_list(reply)
     return(reply)
 
 def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, entitymaster_prompt = ENTITY_MASTER, disambiguator_prompt=DISAMBIGUATOR, forgemaster_prompt=FORGE_MASTER, forgemaster_entities=5, *args, **kwargs):
