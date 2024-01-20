@@ -39,10 +39,7 @@ def create_embedding(text, embedding_model='text-embedding-ada-002'):
     """
 
     try:
-        client = OpenAI(
-            api_key=os.environ.get("OPENAI_AUTH"),
-        )
-
+        client = OpenAI(api_key=os.environ.get("OPENAI_AUTH"))
         response = client.embeddings.create(input=text, model=embedding_model)
         return response.model_dump()
     

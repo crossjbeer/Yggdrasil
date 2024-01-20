@@ -1,52 +1,41 @@
 import numpy as np 
+import re
+from collections import OrderedDict
+import argparse
 
 from chatter import Chatter 
 from colorcodes import Colorcodes
 
-from parsers import make_parser_gpt_sql
+#from parsers import make_parser_gpt_sql
 from pg_vector import grab_k
 from pg_embed import embed 
 from pg_chat import start_chat, connect
-from collections import OrderedDict
 
-import re
-
-def sortXbyY(X, Y):
-    return([x for _, x in sorted(zip(Y, X))])
 
 LORE_MASTER = """You are the LORE MASTER.
-You preside a cherished campaign of Dungeons and Dragons (dnd).
+You preside over a cherished campaign of Dungeons and Dragons (DND).
 Your job is to be the ultimate dnd assistant.
 
 You have an assistant, IGOR.
-IGOR will research for you, and provide you with summaries of relevant information he finds. 
+IGOR will research for you, and provide you with summaries of relevant information they find. 
 Please use IGOR's summaries to inform your answers. 
 
 You will see messages with the following structure: 
-IGOR SUMMARY: <igor's summary>
+
+** STRUCTURE **
+IGOR SUMMARY: 
+<igor's summary>
+
+Knowledge Source: <source of knowledge> 
+Source Description: <description of knowledge source> 
 
 USER QUERY: <user query>
+** STRUCTURE END **
 
 Please use IGOR's summary to accurately answer the USER's query!
-
-Remember, these notes are sacred and should be adheared to. 
 Be thorough and give the user the specific detail they are interested in.   
 And most importantly, be creative and have fun!"""
 
-IGOR1 = """ 
-You are a world-class researcher and have access to the sacred notes of a dnd campaign.
-Your job is to summarize information relevant to a given USER QUERY. 
-
-You will see information passed with the structure: 
-NOTE: <Note Name>
-```
-Relevant information from <Note Name>...
-```
-
-USER QUERY: <question>
-
-Please refer to the question and summarize any information relevant to that question.
-"""
 
 IGOR = """ 
 You are a world-class researcher. 
@@ -68,40 +57,40 @@ Information from <Note Name>...
 Please write your summarized notes as a bulleted list. 
 """
 
-TOOLMASTER1 = """You are the TOOL MASTER. 
-Your job is to help the Game Master (GM) of a dnd campaign by selecting the best tools for a job.
-Your job is to select the best tools for a job when writing a dnd campaign.
+IGOR_ADDED_CONTEXT = """You are a world-class researcher. 
+Your job is to summarize information relevant to a given USER QUERY.
 
-You will be presented with a USER QUERY. This is some question or problem related to the campaign they are running. 
-You will be presented with a list of TOOLS. This is a list of knowledge sources that may be useful for the given USER QUERY.
+You will be presented with a block of INFORMATION.
+This is a some chunk of information that may be relevant to the USER QUERY. 
 
-Please rank the top 3 TOOLS that you think will be most useful for the given USER QUERY.
-If there are less than 3 TOOLS, please rank all of them.
-Do not make up tools or editorialize. That is not the TOOLS MASTER's job.
-Return your answer as a bulleted list.
+The information may be accompanied by some metadata.
+- DOCUMENT NAME: The name of the document storing the information. 
+- KNOWLEDGE SOURCE: The name of the category of information the document belongs to. 
+- SOURCE DESCRIPTION: A description of the knowledge source.
+
+Read through the INFORMATION and included metadata. Summarize any information relevant to the USER QUERY. 
+
+Below is an example of the structure you can expect: 
+
+** STRUCTURE **
+INFORMATION: 
+```<information>```
+METADATA: 
+- DOCUMENT NAME: <document name>
+- KNOWLEDGE SOURCE: <knowledge source>
+- SOURCE DESCRIPTION: <source description>
+
+USER QUERY: <question>
+** STRUCTURE END ** 
+
+DO NOT edit the information. 
+DO NOT editoralize and add your own opinions and infomration. 
+Try to maintain the original context of the information.
+REMEMBER you are a RESEARCHER, not a writer.
+REMEMBER to RESEARCH, not WRITE about what you find.  
+Please write your summarized notes as a bulleted list. 
 """
 
-TOOLMASTER2 = """You are the TOOL MASTER.
-Your job is to help the GAME MASTER (GM) of a Dungeons and Dragons Campaign by selecting the best tools for a job.
-
-The GM has access to their own notes. These are sacred and should be adheared to. They explicitly outline details of the campaign and world.
-However, they only contain information about the world. They contain very little references to rules, mechanics, or other information that is not directly related to the world.
-
-The GM also has access to the Player's Handbook and Dungeon Master's Guide. These are books containing information one must know to be a player or GM, respectively.
-
-You will be presented with a USER QUERY. This is some question or problem related to the campaign.
-Your job is to determine whether or not to bring in supplemental information from the Player's Handbook or Dungeon Master's Guide.
-
-Using the USER QUERY, determine if the question can be best answered by just looking at the GM's notes, or if the Player's Handbook or Dungeon Master's Guide should be consulted.
-Please return your answer like this: 
-- <Tool to Use>
-
-If the question can be answered with only notes, please write: 
-- notes 
-
-Otherwise, write the name of the book to be consulted. For instance: 
-- players handbook
-"""
 
 TOOLMASTER = """You are the TOOL MASTER.
 Your job is to help the GAME MASTER (GM) of a Dungeons and Dragons Campaign by selecting the best tool for the job.
@@ -146,6 +135,7 @@ RESPONSE EXAMPLE:
 Now please go about your job. 
 """
 
+
 ORCHESTRATOR = """You are the ORCHESTRATOR. 
 You must determine if a question has been adequately answered. 
 
@@ -160,17 +150,65 @@ If the ANSWER adequately answers the USER QUERY, please write 'adequate'.
 Otherwise, if you find the question has not been adequately answered, please return ANY AND ALL criticism as a BULLETED LIST.
 """
 
-TOOLS = {'notes':'Notes written by the GAME MASTER (GM) of a dnd campaign. Useful for specific world information, NPCs, lore, etc. Not useful for rules.', 
+
+QUERY_MASTER = """You are the QUERY MASTER. 
+Your job is to improve questions. 
+
+You will be provided with some USER QUERY. This is some question or prompt. It is typically related to a DND Campaign. 
+The USER QUERY will eventually be turned into a vector embedding, which we will use to search. 
+Please improve the USER QUERY by adding any information you think will help the vector embedding.
+DO NOT editoralize the USER QUERY. 
+DO NOT imagine information that isn't explicitly stated. 
+DO NOT add your own opinions.
+DO NOT assume. 
+
+Please return your improved USER QUERY and nothing else. 
+"""
+
+TOOLS = {'notes':'Notes written by the GAME MASTER (GM) of a dnd campaign. Useful for specific world information, NPCs, lore, etc. Not useful for rules. This should likely be referenced in most cases.', 
          'players handbook':'All information one must know to be a Dungeon and Dragons PLAYER. Includes rules for building characters, designing backgrounds, combat, spells, etc.', 
          'dungeon masters guide':'All information required to be a Dungeons and Dragons GAME MASTER (GM). Contains rules for building encounters, designing campaigns, etc.',
          'build a character': 'A small white-page sheet containing 10 steps on how to build a character.'
          }
 
+def make_parser():
+    parser = argparse.ArgumentParser(description="Chat with Yggy")
+
+
+def sortXbyY(X, Y):
+    return([x for _, x in sorted(zip(Y, X))])
+
+def organize_information_from_vectors(vectors, knowledge_source=None, knowledge_source_description=None):
+    all_docs = vectors['note']
+    unique_docs = np.unique(all_docs)
+
+    docs = {}
+    for doc in unique_docs:
+        content = [] 
+        starting_lines = [] 
+
+        for i in range(len(all_docs)):
+            if(vectors['note'][i] == doc):
+                content.append(vectors['content'][i])
+                starting_lines.append(vectors['start_line'][i])
+
+        content = sortXbyY(content, starting_lines)
+        content = "".join(content)
+
+        msg = f"INFORMATION:\n```\n{content}\n```\n"
+        msg += f"METADATA:\n"
+        msg += f"- DOCUMENT NAME: {doc}\n"
+        if(knowledge_source):
+            msg += f"- KNOWLEDGE SOURCE: {knowledge_source}\n"
+            if(knowledge_source_description):
+                msg += f"- SOURCE DESCRIPTION: {knowledge_source_description}\n"
+
+        docs[doc] = msg
+
+    return(docs)
 
 def organize_notes_from_vectors(vectors):
     unique_notes = np.unique(vectors['note'])
-    print("Unique Notes: {}".format(unique_notes))
-    input()
 
     notes = {}
     for note in unique_notes:
@@ -184,8 +222,15 @@ def organize_notes_from_vectors(vectors):
         content = sortXbyY(content, starting_lines)
         content = "".join(content)
 
-        msg = f"""NOTE: {note}\n\n```{content}```"""
+        msg = f"NOTE: {note}\n"
+        msg += f"```\n{content}\n```"
+
         notes[note] = msg
+
+    for note in notes: 
+        print(notes[note])
+        print() 
+    input()
 
     return(notes)
 
@@ -201,6 +246,28 @@ def parse_bulleted_list(text):
     bullet_list = [match[1] for match in bullet_matches]
 
     return bullet_list
+
+def info_grab(prompt, nvec, embedder, namespace=None, *args, **kwargs):
+    embedding = embed(prompt, embedder) 
+    vec = grab_k(embedding, k=nvec, namespace=namespace, *args, **kwargs)
+
+    return(vec)
+
+
+def ask_querymaster(prompt, chatter, querymaster_prompt=QUERY_MASTER, verbose=False):
+    color = Colorcodes()
+    qm_msg = [chatter.getSysMsg(querymaster_prompt)]
+
+    msg = f'USER QUERY: {prompt}'
+    qm_msg.append(chatter.getUsrMsg(msg))
+
+    if(verbose):
+        print(color.pbold(color.pred('\tPassing to QUERY MASTER...')))
+        #chatter.printMessages(qm_msg)
+
+    qm_reply = chatter.passMessagesGetReply(qm_msg)
+
+    return(qm_reply)
 
 def ask_toolmaster(user_query, tm_chatter, tools, toolmaster_prompt=TOOLMASTER, verbose=False):
     color = Colorcodes()
@@ -223,6 +290,7 @@ def ask_toolmaster(user_query, tm_chatter, tools, toolmaster_prompt=TOOLMASTER, 
 
     return(tm_reply)
 
+
 def ask_tokenmaster(user_query, chatter, tools, tokens, toolmaster=TOOLMASTER_TOKEN, verbose=False):
     color = Colorcodes()
     tm_msg = [chatter.getSysMsg(toolmaster)]
@@ -238,6 +306,7 @@ def ask_tokenmaster(user_query, chatter, tools, tokens, toolmaster=TOOLMASTER_TO
     if(verbose):
         print(color.pbold(color.pred('\tPassing to Token Master...')))
         #chatter.printMessages(tm_msg)   
+        #input() 
 
     tm_reply = chatter.passMessagesGetReply(tm_msg)
     tm_reply = parse_bulleted_list(tm_reply)
@@ -262,8 +331,7 @@ def ask_igor(prompt, embedder='text-embedding-ada-002', model='gpt-3.5-turbo', n
     if(verbose):
         print(color.pred(f"\tConverting query into Embedding with model {embedder}..."))
 
-    embed_response = create_embedding(prompt, embedder)
-    embedding = embed_response['data'][0]['embedding']
+    embedding = embed(prompt, embedder)
 
     if(verbose):
         print(color.pred(f'\tGrabbing {nvector} Associated Note Vectors'))
@@ -296,11 +364,12 @@ def ask_igor_small(prompt, igor_notes, chatter=None, model='gpt-3.5-turbo', igor
     if(verbose):
         color = Colorcodes()
         print(color.pbold(color.pred('\tSummarizing with IGOR...')))
-        chatter.printMessages(igor_msg)
+        #chatter.printMessages(igor_msg)
 
     igor_reply = chatter.passMessagesGetReply(igor_msg)
 
     return(igor_reply)
+
 
 def ask_loremaster(prompt, igor_reply, chatter, messages=[], loremaster_prompt = LORE_MASTER, verbose=False):
     if(not len(messages)):
@@ -313,10 +382,9 @@ def ask_loremaster(prompt, igor_reply, chatter, messages=[], loremaster_prompt =
         color = Colorcodes()
         print(color.pbold(color.pred('\tPassing to LORE MASTER...')))
 
-        #chatter.printMessages(messages)
-
     reply = chatter.passMessagesGetReply(messages)
     return(reply, messages)
+
 
 def ask_orchestrator(prompt, answer, chatter, orchestrator_prompt=ORCHESTRATOR, previous_messages = [], used_tools = {}, remaining_tools = {}, verbose=False):
     orch_msg = [chatter.getSysMsg(orchestrator_prompt)] if orchestrator_prompt else [] 
@@ -353,8 +421,6 @@ def ask_orchestrator(prompt, answer, chatter, orchestrator_prompt=ORCHESTRATOR, 
     orch_reply = chatter.passMessagesGetReply(orch_msg)
 
     return(orch_reply)
-
-
 
 
 def noting(model, query, nvector, embedder, host, port, user, password, database, lore_master=LORE_MASTER, igor=IGOR, verbose=True, *args, **kwargs):
@@ -398,16 +464,10 @@ def noting(model, query, nvector, embedder, host, port, user, password, database
         #    append_message(connection, chat_id, loremaster_msg[-2]['content'], 'user')
         #    append_message(connection, chat_id, loremaster_msg[-1]['content'], 'assistant')
 
-        chatter.printMessages(loremaster_msg[-2:])
+        #chatter.printMessages(loremaster_msg[-2:])
         input('Continue?')
 
         prompt = None 
-
-def info_grab(prompt, nvec, embedder, namespace=None, *args, **kwargs):
-    embedding = embed(prompt, embedder) 
-    vec = grab_k(embedding, k=nvec, namespace=namespace, *args, **kwargs)
-
-    return(vec)
 
 def orchestrate_step(prompt, model, chatter, nvector, embedder, verbose, toolmaster=TOOLMASTER, igor=IGOR, loremaster=LORE_MASTER, orchestrator=ORCHESTRATOR, tools=TOOLS, loremaster_dialogue=[], *args, **kwargs):
     color = Colorcodes() 
@@ -455,33 +515,32 @@ def orchestrate_step(prompt, model, chatter, nvector, embedder, verbose, toolmas
 def tokenmaster_step(prompt, model, chatter, embedder, verbose, total_tokens = 5, toolmaster=TOOLMASTER_TOKEN, igor=IGOR, loremaster=LORE_MASTER, tools=TOOLS, loremaster_dialogue=[], *args, **kwargs):
     color = Colorcodes() 
     igor_summaries = OrderedDict() 
-    tm_reply = ask_tokenmaster(prompt, chatter, tools, total_tokens, verbose=verbose, toolmaster=toolmaster)
-    sorted_keys = sorted(tm_reply, key=lambda x: tm_reply[x], reverse=True)
 
+    tm_reply = ask_tokenmaster(prompt, chatter, tools, total_tokens, verbose=verbose, toolmaster=toolmaster)
+
+    sorted_keys = sorted(tm_reply, key=lambda x: tm_reply[x], reverse=True)
     for i, sortkey in enumerate(sorted_keys):
         if(tm_reply[sortkey] == 0):
             continue
-
         print(color.pgreen(f"\t\tTool {i+1}: {sortkey} [{tm_reply[sortkey]} Tokens]"))
 
     for i, sortkey in enumerate(sorted_keys):
-        namespace = sortkey 
-        note_vector = info_grab(prompt, tm_reply[sortkey], embedder, namespace=namespace, *args, **kwargs)
-        igor_notes = organize_notes_from_vectors(note_vector)
+        note_vector = info_grab(prompt, tm_reply[sortkey], embedder, namespace=sortkey, *args, **kwargs)
+        #igor_notes = organize_notes_from_vectors(note_vector)
+        igor_info = organize_information_from_vectors(note_vector, knowledge_source=sortkey, knowledge_source_description=tools[sortkey])
 
-        igor_summary = ask_igor_small(prompt, igor_notes, chatter, model, igor, verbose=verbose)
+        igor_summary = ask_igor_small(prompt, igor_info, chatter, model, igor, verbose=verbose)
         igor_summaries[sortkey] = igor_summary
 
     full_igor_summary = ""
     for note in igor_summaries: 
-        full_igor_summary += f"Knowledge Source: {note}\n\nIgor Summary:\n{igor_summaries[note]}\n\n"
+        full_igor_summary += f"Knowledge Source: {note}\nSource Description: {tools[note]}\n\nIgor Summary:\n{igor_summaries[note]}\n\n"
 
     print("Full Igor Summary:\n", full_igor_summary)
 
     loremaster_reply, loremaster_msg = ask_loremaster(prompt, full_igor_summary, chatter, messages=loremaster_dialogue, verbose=verbose, loremaster_prompt=loremaster)
 
     return(loremaster_reply, loremaster_msg)
-
 
 def orchestrate(model, query, nvector, embedder, lore_master=LORE_MASTER, igor=IGOR, verbose=True, *args, **kwargs):
     color = Colorcodes()
@@ -505,8 +564,7 @@ def orchestrate(model, query, nvector, embedder, lore_master=LORE_MASTER, igor=I
 
         prompt = None 
 
-
-def tokenmaster(model, query, nvector, embedder, loremaster=LORE_MASTER, igor=IGOR, verbose=True, *args, **kwargs):
+def tokenmaster(model, query, nvector, embedder, loremaster=LORE_MASTER, igor=IGOR_ADDED_CONTEXT, toolmaster=TOOLMASTER_TOKEN, verbose=True, *args, **kwargs):
     """
     Here we will simplify the orchestration endpoint. Right now the orchestrator works after the Igor+Lore Master step. 
     The Tool Master first ranks the tools it hopes to use. 
@@ -529,27 +587,30 @@ def tokenmaster(model, query, nvector, embedder, loremaster=LORE_MASTER, igor=IG
 
     loremaster_dialogue = [] 
     loremaster_dialogue.append(chatter.getSysMsg(loremaster))
-    prompt = query 
 
+    prompt = query 
     while True:
         if(prompt is None):
             prompt = chatter.usrprompt()
 
-        loremaster_reply, loremaster_msg = tokenmaster_step(prompt, model, chatter, embedder, verbose, total_tokens=nvector, toolmaster=TOOLMASTER_TOKEN, igor=igor, loremaster=loremaster, orchestrator=ORCHESTRATOR, *args, **kwargs)
-        
-        loremaster_dialogue.append(chatter.getUsrMsg(loremaster_msg[-1]['content']))
+        qm_reply = ask_querymaster(prompt, chatter, querymaster_prompt=QUERY_MASTER, verbose=verbose)
+        print(qm_reply)
+        prompt = qm_reply 
+
+        loremaster_reply, _ = tokenmaster_step(prompt, model, chatter, embedder, verbose, total_tokens=nvector, toolmaster=toolmaster, igor=igor, loremaster=loremaster, loremaster_dialogue=loremaster_dialogue, *args, **kwargs)
         loremaster_dialogue.append(chatter.getAssMsg(loremaster_reply))
 
-        #print(color.pgreen(loremaster_reply))
-        chatter.printMessages(loremaster_dialogue)
+        print(color.pgreen(loremaster_reply))
         input('Continue?')
 
         prompt = None
 
+    return() 
+
 
 
 def main():
-    parser = make_parser_gpt_sql()
+    #parser = make_parser_gpt_sql()
     args = parser.parse_args() 
 
     #noting(**vars(args))

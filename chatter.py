@@ -17,9 +17,12 @@ class Chatter():
 
         self.logfile = logfile 
         self.log=None
-        self.log = self.getLog(self.logfile)
+        #self.log = self.getLog(self.logfile)
 
         self.client = OpenAI(api_key=os.environ.get("OPENAI_AUTH"))
+
+    def __call__(self, messages=[]):
+        return(self.passMessagesGetReply(messages))
 
     def getFuncNameFromResponse(self, response):
         return(response['function_call']['name'])
@@ -115,7 +118,7 @@ class Chatter():
         return()        
     
     def toolChat(self, prompt=None, extra_messages=[], halt=False):
-        self.getlog()
+        #self.getlog()
 
         total = 0 
         messages = [] 
@@ -132,7 +135,7 @@ class Chatter():
         return(input(f"{c.blue}Prompt> {c.reset}"))
 
     def chat(self, prompt=None, include_previous_replies=False, extra_messages=[], halt=False):
-        self.getLog()
+        #self.getLog()
 
         total = 0
         messages = []  

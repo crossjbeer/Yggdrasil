@@ -416,7 +416,6 @@ class Scripter:
     def getText(self, df):
         txt = "" 
         for t in df.text:
-            #txt += t + '\n'
             txt += t
 
         return(txt)
@@ -484,6 +483,44 @@ class Scripter:
             df.loc[df.index == i, 'class'] = cl
 
         return(df)
+    
+    def parseCategoriesFromInfoDoc(self, df, category_key='Category'):
+        import re 
+        all_categories = [] 
+        for i, line in df.iterrows():
+            if(re.search(category_key, line['text'])):
+                category = line['text'].split(': ')[1].strip()
+                all_categories.append(category)
+
+        return(all_categories)
+    
+    def parseCategoriesAndInfoFromInfoDoc(self, df, category_key='Category'):
+        import re 
+        categories = {}
+
+        category = None 
+        information = [] 
+        for i, line in df.iterrows():
+            if(re.search(category_key, line['text'])):
+                if(information is not None and category is not None):
+                    for info in information:
+                        categories[category].append(info)
+
+                    information = []    
+                    category = None
+
+                category = line['text'].split(': ')[1].strip()
+                if(category not in categories):
+                    categories[category] = []
+                    
+            elif(category is not None):
+                information.append(line['text'])
+
+        if(information is not None and category is not None):
+            for info in information:
+                categories[category].append(info)
+
+        return(categories)
 
 
 def jaccard_distance(list_of_strings, input_string):

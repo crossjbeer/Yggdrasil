@@ -1,7 +1,11 @@
 from flask import Flask, Blueprint, request
 from openai import OpenAI 
-import os 
-from parsers import make_parser_gpt_sql
+import os
+import argparse
+
+#from parsers import make_parser_gpt_sql
+from parsers import parser_gpt, parser_sql
+
 from pg_chat import connect, grab_chat, start_chat, append_message
 from noting import ask_igor, ask_loremaster, orchestrate_step
 
@@ -11,7 +15,15 @@ HOST = 'localhost'
 PORT = '5432'
 DATABASE = 'yggdrasil'
 
-parser = make_parser_gpt_sql()
+def make_parser():
+    parser = argparse.ArgumentParser(description='Start our Yggy API')
+
+    parser = parser_gpt(parser)
+    parser = parser_sql(parser)
+
+    return(parser)
+
+parser = make_parser()
 args= parser.parse_args()
 
 app = Flask(__name__)
