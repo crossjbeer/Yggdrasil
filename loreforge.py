@@ -199,7 +199,6 @@ def disambiguator_step(named_entities, lore_entries, chatter, disambiguator_prom
     input("DIS REPLY ^^")
 
     reply = parse_bulleted_list(reply)
-    #reply = [i.split('.')[0] if i.endswith('.txt') else i for i in reply]
 
     print(reply)
     input("PARSE REPLY &")
@@ -249,15 +248,15 @@ def forgemaster_step(named_entities, info, chatter, forgemaster_prompt = FORGE_M
 
     return(reply)
 
-def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, entitymaster_prompt = ENTITY_MASTER, disambiguator_prompt=DISAMBIGUATOR, forgemaster_prompt=FORGE_MASTER, forgemaster_entities=5, *args, **kwargs):
-    color = cc() 
+def grab_existing_lore(lore_dir):
     existing_lore = os.listdir(lore_dir)
     existing_lore = [i.split('.')[0] for i in existing_lore if i.endswith('.txt')]
 
-    print("Existing Lore:")
-    print(existing_lore)
-    input('Continue?')
+    return(existing_lore)
 
+def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, entitymaster_prompt = ENTITY_MASTER, disambiguator_prompt=DISAMBIGUATOR, forgemaster_prompt=FORGE_MASTER, forgemaster_entities=5, *args, **kwargs):
+    color = cc() 
+    
     # Ask the entity master for named entities in the given information
     print(color.pred('Grabbing Entities...'))
     named_entities = entitymaster_step(info, chatter, doc_name=doc_name, doc_desc=doc_desc, entitymaster_prompt=entitymaster_prompt)
@@ -267,50 +266,45 @@ def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, e
         print("Entity: {}".format(named_entity))
         print("Info:\n{}".format("\n".join(info)))
         print()
-    input() 
 
-    entities = list(named_entities.keys())
-    for i in range(0, len(entities), forgemaster_entities):
-        current_entities = entities[i:min(i+forgemaster_entities, len(entities)-1)]
-        lore_entries = disambiguator_step(current_entities, existing_lore, chatter, disambiguator_prompt=disambiguator_prompt)
+    input('Continue?') 
 
-        print("Lore Entries:")
-        print(lore_entries)
+    existing_lore = grab_existing_lore(lore_dir)
 
-        for entity, lore_entry in zip(current_entities, lore_entries):
-            pth = os.path.join(lore_dir, lore_entry+'.txt')
+    print("Existing Lore:")
+    print(existing_lore)
+    input('Continue?')
 
-            with open(pth, 'a') as f:
-                f.write('\n'+entity)
-                f.write('\n'+'\n'.join(named_entities[entity]))
+    if(len(existing_lore)):
+        entities = list(named_entities.keys())
+        for i in range(0, len(entities), forgemaster_entities):
+            current_entities = entities[i:min(i+forgemaster_entities, len(entities)-1)]
+            lore_entries = disambiguator_step(current_entities, existing_lore, chatter, disambiguator_prompt=disambiguator_prompt)
 
-    print("Named Entities:")
-    for ne in named_entities: 
-        print(ne)
-        pth = os.path.join(lore_dir, ne+'.txt')
+            entity_to_lore = {i:j for i,j in zip(current_entities, lore_entries)}
+            for entity in entity_to_lore:
+                lore = entity_to_lore[entity]
+                if(lore in existing_lore):
+                    with open(os.path.join(lore_dir, lore+'.txt'), 'a') as f:
+                        f.write('\n'+'\n'.join(named_entities[entity]))
 
-        if(ne not in existing_lore):
-            with open(pth, 'w') as f:
-                f.write('# File to store information about [{}]\n'.format(ne))
+                else:
+                    print("Creating new lore entry for {}".format(entity))
+                    pth = os.path.join(lore_dir, lore+'.txt')
+                    with open(pth, 'w') as f:
+                        f.write('\n'.join(named_entities[entity]))
 
-    # Use the Forge Master to load the information into the appropriate lore entries. 
-    for i in range(0, len(named_entities), forgemaster_entities):
-        current_entites = named_entities[i:min(i+forgemaster_entities, len(named_entities)-1)]
-
-        print("CURRENT ENTITIES:")
-        print(current_entites)
-
-        entity_to_info = forgemaster_step(current_entites, info, chatter, forgemaster_prompt=forgemaster_prompt)
-
-        for entity, info in entity_to_info.items():
-            pth = os.path.join(lore_dir, entity+'.txt')
-
-            with open(pth, 'a') as f:
-                f.write('\n'+info)
-
-        
-
-
+    else: 
+        print("Named Entities:")
+        for named_entity, info in named_entities.items():
+            print("Entity: {}".format(named_entity))
+            print("Info:\n{}".format("\n".join(info)))
+            
+            if(len(info)):
+                print("Creating new lore entry for {}".format(named_entity))
+                pth = os.path.join(lore_dir, named_entity+'.txt')
+                with open(pth, 'w') as f:
+                    f.write('\n'.join(info))
     
 
 
