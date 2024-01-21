@@ -45,6 +45,7 @@ You will be provided with the following:
 - A DESCRIPTION of the DOCUMENT that the CATEGORIZER has built the CATEGORIES from.
 
 Your job is to disambiguate the CATEGORIES.
+Make sure you write at least 250 categories.
 Please return the disambiguated CATEGORIES as a BULLETED LIST.
 """
 
@@ -139,7 +140,7 @@ def main():
     for i, category in enumerate(disambiguated_categories):
         print(f"{i+1}. {category}")
 
-        
+
 
 if(__name__ == "__main__"):
     main()
