@@ -14,21 +14,29 @@ from colorcodes import Colorcodes as cc
 
 ENTITY_MASTER = """You are the ENTITY MASTER.
 Your job is to find NAMED ENTITIES in a given snippet of INFORMATION. 
+In this case, a NAMED ENTITY is a word or phrase that is a name of a PERSON, PLACE, THING, or IDEA.
 
 You will be provided with a snippet of INFORMATION. 
 The INFORMATION may be accompanied by: 
 - Document Name: The name of the document the INFORMATION was taken from.
 - Document Description: A short description of the document the INFORMATION was taken from.
 
-Your job is to parse the INFORMATION to find all NAMED ENTITIES. 
+Your job is to find all NAMED ENTITIES in the INFORMATION. 
+You should gather all information that is relevant to each NAMED ENTITY.
 
-In this case, a NAMED ENTITY is a word or phrase that is a name of a PERSON, PLACE, THING, or IDEA.
-We are breaking down manuals and technical documents, so be sure to be thorough. 
+Be thorough. We are working wit manuals and technical documents, so information is important. 
 Also know that the INFORMATION may be poorly formatted. Most commonly, words have spaces where there shouldn't be. 
 Please do your best to clean up the info where possible. 
 
-You should output your findings as a BULLETED LIST. 
-Each named entity should be lowercase and use underscores instead of spaces.
+Once you have found all NAMED ENTITIES, and organized the relevant information, you should output your findings.
+For each NAMED ENTITY, you should output with the following format: 
+- Entity: <ENTITY>
+- <Relevant information 1>
+- <Relevant information 2>
+- ... 
+- <Relevant information N>
+
+Each <ENTITY> should be lowercase and use underscores instead of spaces.
 
 Now please take a deep breath and let's get started! 
 """
@@ -108,6 +116,21 @@ def make_parser():
 
     return(parser)
 
+def parse_entitymaster(reply):
+    named_entities = {}
+
+    reply = reply.split('\n')
+    for line in reply:
+        if(line.startswith('Entity:')):
+            entity = line.split('Entity:')[1].strip()
+            named_entities[entity] = []
+
+        elif(entity and line.startswith('- ')):
+            info = line.split('- ')[1].strip()
+            named_entities[entity].append(info)
+
+    return(named_entities)
+
 def entitymaster_step(info, chatter, doc_name=None, doc_desc=None, entitymaster_prompt = ENTITY_MASTER):
     """
     This function performs a single interaction with the ENTITY MASTER (EM). 
@@ -127,10 +150,8 @@ def entitymaster_step(info, chatter, doc_name=None, doc_desc=None, entitymaster_
 
     messages.append(chatter.getUsrMsg(prompt))
     reply = chatter(messages)
-    #print(reply)
-    #input("EM REPLY ^^")
 
-    reply = parse_bulleted_list(reply)
+    reply = parse_entitymaster(reply)
     return(reply)
 
 def disambiguator_step(named_entities, lore_entries, chatter, disambiguator_prompt = DISAMBIGUATOR):
@@ -208,6 +229,13 @@ def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, e
     # Ask the entity master for named entities in the given information
     print(color.pred('Grabbing Entities...'))
     named_entities = entitymaster_step(info, chatter, doc_name=doc_name, doc_desc=doc_desc, entitymaster_prompt=entitymaster_prompt)
+
+    for named_entity, info in named_entities.items():
+        print("Entity: {}".format(named_entity))
+        print("Info:\n{}".format("\n".join(info)))
+        print()
+
+    input() 
 
     if(len(existing_lore)):
         existing_lore = [i for i in existing_lore if i.endswith('.txt')]
