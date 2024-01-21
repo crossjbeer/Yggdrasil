@@ -75,10 +75,20 @@ NAMED ENTITIES are PEOPLE, PLACES, THINGS, and IDEAS.
 
 You will be provided with a list of NAMED ENTITIES.
 You will also be provided with a list of FILES.
+
 File names are named entities. 
 For instance, a file named 'dogs' contains information about dogs. 
 
-If you were to be provided with the NAMED ENTITY 'dog', you should assign it to the file 'dogs'.
+Example of an interaction: 
+FILES: ['dogs', 'dobermen', 'cats', 'birds']
+NAMED ENTITIES: ['dog', 'cat', 'chihuahua']
+
+Output: 
+- dogs
+- cats
+- chihuahuas
+
+If you were to be provided with the NAMED ENTITY 'dog', you should assign it to the FILE 'dogs'.
 However, if you were provided with the NAMED ENTITY 'doberman', you should assign it to the file 'doberman'.
 Maintain file name conventions. 
 They should be lowercase, and use underscores instead of spaces.
@@ -94,7 +104,8 @@ If a FILE exists, assign the NAMED ENTITY to that FILE.
 Output your response as a bulleted list, with as many bullets as NAMED ENTITIES.
 """
 
-FORGE_MASTER = """You are the FORGE MASTER. 
+FORGE_MASTER = """You are the FORGE MASTER.  : 
+
 You are an expert researcher and writer. 
 
 You will be provided with a small list of NAMED ENTITIES. 
@@ -187,11 +198,18 @@ def disambiguator_step(named_entities, lore_entries, chatter, disambiguator_prom
 
     messages = [chatter.getSysMsg(disambiguator_prompt)]
 
-    prompt = """NAMED ENTITIES:\n{}""".format('\n'.join(named_entities))
+    #prompt = """NAMED ENTITIES:\n{}""".format('\n'.join(named_entities))
+    prompt = f"""NAMED ENTITIES: {named_entities}"""
     messages.append(chatter.getUsrMsg(prompt))
 
-    prompt = """LORE ENTRIES:\n{}""".format('\n'.join(lore_entries))
+    file_str = "["
+    for file in lore_entries: 
+        file_str += f"'{file}', "
+    file_str = file_str[:-2] + "]"
+    prompt = f"""FILES: {file_str}"""
     messages.append(chatter.getUsrMsg(prompt))
+
+    chatter.printMessages(messages)
 
     reply = chatter(messages)
 
