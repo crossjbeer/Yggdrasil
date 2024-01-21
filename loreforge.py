@@ -347,7 +347,11 @@ def main():
     
     script = Scripter()
     df = script.loadTxt(args.path, parseOnSentence=True)
-    print(df)
+
+    for line in df.text: 
+        print(line)
+        input() 
+
     token_chunks = script.splitDFIntoTokenChunks(df, args.token_lim, lag=args.lag)
 
     chatter = Chatter(args.model)
