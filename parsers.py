@@ -30,6 +30,16 @@ def parser_gpt(parser):
 
     return(parser)
 
+def parser_doc(parser):
+    parser.add_argument('-p', '--path', help='Path to a .txt file to categorize.', type=valid_path)
+    parser.add_argument('--token_lim', help='Number of tokens to chunk the .txt file into.', type=int, default=750)
+    parser.add_argument('--lag', type=int, help='Number of tokens to lag between chunks. (Default: 0)', default=0)
+
+    parser.add_argument('--doc_name', help='Name of the document to be parsed.', default=None, type=str)
+    parser.add_argument('--doc_desc', help='Description of the document to be parsed.', default=None, type=str)
+
+    return(parser)
+
 def main():
     parser = make_parser_gpt_sql()
 
