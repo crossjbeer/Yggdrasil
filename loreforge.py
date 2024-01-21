@@ -125,6 +125,7 @@ def parse_entitymaster(reply):
     named_entities = {}
 
     reply = reply.split('\n')
+    entity = None 
     for line in reply:
         if(line.startswith('Entity:')):
             entity = line.split('Entity:')[1].strip()
