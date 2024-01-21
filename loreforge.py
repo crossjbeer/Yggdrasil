@@ -7,6 +7,7 @@ from scripter import Scripter
 from noting import parse_bulleted_list
 from parsers import parser_gpt, parser_sql, valid_path, valid_path_build
 from colorcodes import Colorcodes as cc 
+import re
 
 ENTITY_MASTER = """You are the ENTITY MASTER.
 You are an expert writer and researcher.
@@ -125,15 +126,19 @@ def parse_entitymaster(reply):
     reply = reply.split('\n')
     entity = None 
     for line in reply:
-        if(line.startswith('- Entity:')):
-            entity = line.split('- Entity:')[1].strip()
-            named_entities[entity] = []
+        if re.match(r'^(\t*-|-)', line):
+            if line.startswith('\t'):
+                line = line.lstrip('\t')
+            else:
+                line = line.lstrip('-')
+                
+            if entity:
+                named_entities[entity].append(line)
+            else:
+                entity = line
+                named_entities[entity] = []
 
-        elif(entity and line.startswith('- ')):
-            info = line.split('- ')[1].strip()
-            named_entities[entity].append(info)
-
-    return(named_entities)
+    return named_entities
 
 def entitymaster_step(info, chatter, doc_name=None, doc_desc=None, entitymaster_prompt = ENTITY_MASTER):
     """
