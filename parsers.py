@@ -39,11 +39,3 @@ def parser_doc(parser):
     parser.add_argument('--doc_desc', help='Description of the document to be parsed.', default=None, type=str)
 
     return(parser)
-
-def main():
-    parser = make_parser_gpt_sql()
-
-    parser.parse_args()
-
-if(__name__ == "__main__"):
-    main()

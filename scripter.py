@@ -170,7 +170,7 @@ class Scripter:
                 for char in line:
                     if char in sentence_delim:
                         if current_sentence:
-                            sentences.append(current_sentence.strip())
+                            sentences.append(current_sentence.strip()+'\n')
                         current_sentence = ""
                     else:
                         current_sentence += char

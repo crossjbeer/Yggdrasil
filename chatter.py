@@ -17,7 +17,6 @@ class Chatter():
 
         self.logfile = logfile 
         self.log=None
-        #self.log = self.getLog(self.logfile)
 
         self.client = OpenAI(api_key=os.environ.get("OPENAI_AUTH"))
 

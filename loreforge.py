@@ -127,9 +127,6 @@ def make_parser():
     parser.add_argument('--token_lim', type=int, help='Chunk size the document will be split into. (Default: 1000)', default=1000)
     parser.add_argument('--lag', type=int, help='Number of tokens to lag between chunks. (Default: 0)', default=0)
 
-    parser.add_argument('--doc_name', help='Name of the document to be parsed.', default=None, type=str)
-    parser.add_argument('--doc_desc', help='Description of the document to be parsed.', default=None, type=str)
-
     parser.add_argument('--delete_lore', help='Delete existing lore entires', action='store_true')
 
     parser = parser_gpt(parser)
