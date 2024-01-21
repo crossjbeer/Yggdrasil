@@ -154,7 +154,7 @@ class Scripter:
         self.tizer = Tokenizer(self.model)
         return(self.tizer)
 
-    def loadTxt(self, path, parseOnSentence=False):
+    def loadTxt(self, path, parseOnSentence=False, sentence_delim=['.', '?', '!']):
         self.txt_path = path 
 
         txt = open(path, 'r')
@@ -166,11 +166,18 @@ class Scripter:
                 continue
 
             if parseOnSentence:
-                sentences += re.split(r'(?<=[.!?])\s+', line)
+                current_sentence = ""
+                for char in line:
+                    if char in sentence_delim:
+                        if current_sentence:
+                            sentences.append(current_sentence.strip())
+                        current_sentence = ""
+                    else:
+                        current_sentence += char
+                if current_sentence:
+                    sentences.append(current_sentence.strip())
             else:
                 sentences.append(line)
-
-        #sentences = [i.strip() for i in sentences]
 
         df = pd.DataFrame(sentences, columns=['text'])
         return df
