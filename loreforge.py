@@ -79,9 +79,9 @@ FILES: ['dogs', 'dobermen', 'cats', 'birds']
 NAMED ENTITIES: ['dog', 'cat', 'chihuahua']
 
 Output: 
-- dogs
-- cats
-- chihuahuas
+- dog: dogs
+- cat: cats
+- chihuahua: chihuahuas
 
 If you were to be provided with the NAMED ENTITY 'dog', you should assign it to the FILE 'dogs'.
 However, if you were provided with the NAMED ENTITY 'doberman', you should assign it to the file 'doberman'.
@@ -96,7 +96,7 @@ For each NAMED ENTITY, you decide if an appropriate FILE exists.
 If not, use the name of the NAMED ENTITY to create a new FILE.
 If a FILE exists, assign the NAMED ENTITY to that FILE.
 
-Output your response as a bulleted list, with as many bullets as NAMED ENTITIES.
+Output your response as a bulleted list.
 """
 
 FORGE_MASTER = """You are the FORGE MASTER.  : 
@@ -194,7 +194,6 @@ def disambiguator_step(named_entities, lore_entries, chatter, disambiguator_prom
 
     messages = [chatter.getSysMsg(disambiguator_prompt)]
 
-    #prompt = """NAMED ENTITIES:\n{}""".format('\n'.join(named_entities))
     prompt = f"""NAMED ENTITIES: {named_entities}"""
     messages.append(chatter.getUsrMsg(prompt))
 
@@ -213,6 +212,7 @@ def disambiguator_step(named_entities, lore_entries, chatter, disambiguator_prom
     input("DIS REPLY ^^")
 
     reply = parse_bulleted_list(reply)
+
 
     print(reply)
     input("PARSE REPLY &")
@@ -360,7 +360,6 @@ def main():
         print("CHUNK ***")
         print(chunk)
         print("************")
-        #input() 
 
         forge_step(chunk, chatter, **vars(args))
 
