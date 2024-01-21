@@ -12,7 +12,7 @@ import re
 import random
 import argparse 
 
-from parsers import parser_gpt, valid_path, valid_path_build
+from parsers import parser_gpt, valid_path, valid_path_build, parser_doc
 from scripter import Scripter 
 from chatter import Chatter 
 from loreforge import parse_bulleted_list
@@ -37,13 +37,14 @@ Let's get started!
 def make_parser():
     parser = argparse.ArgumentParser(description='Build corpus of category names.')
 
-    parser.add_argument('-p', '--path', type=valid_path, help='Path to a .txt file to categorize.')
+    #parser.add_argument('-p', '--path', type=valid_path, help='Path to a .txt file to categorize.')
     parser.add_argument('--num', type=int, default=5, help='Number of samples to take from the token chunks of the .txt file.')
     parser.add_argument('-r', '--reps', type=int, default=10, help='Number of times to sample from the .txt file.')
-    parser.add_argument('--token_lim', type=int, default=750, help='Number of tokens to chunk the .txt file into.')
+    #parser.add_argument('--token_lim', type=int, default=750, help='Number of tokens to chunk the .txt file into.')
     parser.add_argument('--save_dir_seed', type=valid_path_build, default='./lore/', help='Directory to save the corpus to.')
 
     parser = parser_gpt(parser)
+    parser = parser_doc(parser)
     
     return(parser)
 
