@@ -79,7 +79,8 @@ def main():
     script = Scripter() 
     df = script.loadTxt(args.path, parseOnSentence=True)
 
-    token_chunks = script.splitDFIntoTokenChunks(df, args.token_lim)
+    #token_chunks = script.splitDFIntoTokenChunks(df, args.token_lim)
+    token_chunks = script.tokenChunks(df, args.token_lim, args.lag)
 
     all_categories = []
     for i in range(args.reps):

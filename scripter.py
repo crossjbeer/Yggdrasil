@@ -365,6 +365,16 @@ class Scripter:
             chunks.append(self.getDFRows(df, i, j-i, cols))
 
         return(chunks)
+    
+    def tokenChunks(self, df, tokenCost, filter=False, cols=['text'], lag=0):
+        token_bounds = self.getAllTokenChunkBounds(df, tokenCost, filter, cols, lag)
+
+        chunks = []
+        for i, j in token_bounds:
+            #chunks.append(self.getDFRows(df, i, j-i, cols))
+            chunks.append(self.getText(self.getDFRows(df, i, j-i, cols)))
+
+        return(chunks)
 
 
     def combineRowList(self, row_list, name_dict={}):
