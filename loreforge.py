@@ -213,6 +213,7 @@ def disambiguator_step(named_entities, lore_entries, chatter, disambiguator_prom
 
     reply = parse_bulleted_list(reply)
 
+    reply = [i.split(':')[-1].strip() for i in reply]
 
     print(reply)
     input("PARSE REPLY &")
