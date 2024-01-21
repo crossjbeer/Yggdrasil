@@ -63,6 +63,9 @@ def ask_categorizer(chunk_sample, chatter, doc_name, doc_desc, categorizer_promp
     for i, chunk in enumerate(chunk_sample):
         messages.append(chatter.getSysMsg(f"CHUNK {i+1}:\n{chunk}"))
 
+    chatter.printMessages(messages)
+    input() 
+
     reply = chatter(messages)
     return(parse_bulleted_list(reply))
 
