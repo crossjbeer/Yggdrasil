@@ -10,8 +10,6 @@ from colorcodes import Colorcodes as cc
 import re
 
 ENTITY_MASTER = """You are the ENTITY MASTER.
-You are an expert writer and researcher.
-
 Your job is to find NAMED ENTITIES in a given snippet of INFORMATION. 
 A NAMED ENTITY is a word or phrase that is a name of a PERSON, PLACE, THING, or IDEA.
 
@@ -20,17 +18,16 @@ The INFORMATION may be accompanied by:
 - Document Name: The document the INFORMATION was taken from.
 - Document Description: A short description of the document.
 
+You should find all NAMED ENTITIES in the INFORMATION.
 Gather all details that are relevant to each NAMED ENTITY.
 Write them as a bulleted list.
 
-Be thorough. 
-Include factual information, such as values, numbers, and rules. 
+Include all factual information, such as values, numbers, and rules. 
 You may remove unnecesasry flavor text.
 
 The INFORMATION may be poorly formatted. Most commonly, words have spaces where there shouldn't be. 
 Please do your best to clean up the info where possible. 
 
-Find all NAMED ENTITIES and organize the relevant information. 
 For each NAMED ENTITY, you should output with the following format: 
 - Entity: <ENTITY>
 - <Relevant information 1>
