@@ -38,7 +38,7 @@ def make_parser():
     parser = argparse.ArgumentParser(description='Build corpus of category names.')
 
     parser.add_argument('-p', '--path', type=valid_path, help='Path to a .txt file to categorize.')
-    parser.add_argument('-n', '--num', type=int, default=5, help='Number of samples to take from the token chunks of the .txt file.')
+    parser.add_argument('--num', type=int, default=5, help='Number of samples to take from the token chunks of the .txt file.')
     parser.add_argument('-r', '--reps', type=int, default=10, help='Number of times to sample from the .txt file.')
     parser.add_argument('--token_lim', type=int, default=750, help='Number of tokens to chunk the .txt file into.')
     parser.add_argument('--save_dir_seed', type=valid_path_build, default='./lore/', help='Directory to save the corpus to.')
