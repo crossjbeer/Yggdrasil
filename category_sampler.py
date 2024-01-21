@@ -27,6 +27,7 @@ You will finally be provided with several chunks of text from the DOCUMENT.
 
 Your job is to build the list of CATEGORIES from the chunks of text. 
 Please note that the chunks of text are not necessarily contiguous.
+Be sure to build about 20 categories. 
 
 Return the list of CATEGORIES as a BULLETED LIST. 
 
@@ -82,10 +83,16 @@ def main():
         sample = random.sample(token_chunks, args.num)
 
         categories = ask_categorizer(sample, chatter, **vars(args))
+        print(f"Step {i+1} of {args.reps} complete.")
+        for cat in categories: 
+            print(cat)
+
         all_categories.extend(categories)
 
+    print("All Categories")
     for i, category in enumerate(all_categories):
         print(f"{i+1}. {category}")
+    print("***")
 
 if(__name__ == "__main__"):
     main()
