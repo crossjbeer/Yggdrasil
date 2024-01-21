@@ -293,6 +293,8 @@ def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, e
                     pth = os.path.join(lore_dir, lore+'.txt')
                     with open(pth, 'w') as f:
                         f.write('\n'.join(named_entities[entity]))
+            
+            existing_lore = grab_existing_lore(lore_dir)
 
     else: 
         print("Named Entities:")
