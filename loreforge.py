@@ -133,7 +133,9 @@ def parse_entitymaster(reply):
             print('LINE: {}'.format(line))
             if line.startswith('\t'):
                 line = line.lstrip('\t')
+                line = line.strip() 
             line = line.lstrip('-')
+            line = line.strip() 
 
             print("Processed Line: {}".format(line))
 
