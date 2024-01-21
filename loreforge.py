@@ -29,6 +29,9 @@ Include factual information, such as values, numbers, and rules.
 You may remove unnecesasry flavor text.
 We are trying to condense this information. 
 
+DO NOT MAKE 'sub entities'.
+Instead, just make another named-entity. 
+
 Also know that the INFORMATION may be poorly formatted. Most commonly, words have spaces where there shouldn't be. 
 Please do your best to clean up the info where possible. 
 
