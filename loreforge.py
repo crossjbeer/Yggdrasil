@@ -150,8 +150,9 @@ def parse_entitymaster(reply):
             line = line.lstrip('-')
             line = line.strip() 
 
-            if(line.startswith('Entity:')):
-                entity = line.split('Entity:')[1].strip()
+            if(line.startswith('Entity:') or line.startswith('entity')):
+                entity_str = 'entity:' if line.startswith('entity') else 'Entity:'
+                entity = line.split(entity_str)[1].strip()
                 named_entities[entity] = []
             elif(entity):
                 named_entities[entity].append(line)
