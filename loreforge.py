@@ -1,7 +1,3 @@
-"""
-We will use this project to build lore entries for NAMED ENTITIES in provided DOCUMENTS. 
-"""
-
 # Imports
 import argparse 
 import os
@@ -20,15 +16,17 @@ A NAMED ENTITY is a word or phrase that is a name of a PERSON, PLACE, THING, or 
 
 You will be provided with a snippet of INFORMATION. 
 The INFORMATION may be accompanied by: 
-- Document Name: The name of the document the INFORMATION was taken from.
-- Document Description: A short description of the document the INFORMATION was taken from.
+- Document Name: The document the INFORMATION was taken from.
+- Document Description: A short description of the document.
 
 Your job is to find all NAMED ENTITIES in the INFORMATION. 
-You should also gather all information that is relevant to each NAMED ENTITY, and write it as a bulleted list.
+You should also gather all details that are relevant to each NAMED ENTITY.
+Write them as a bulleted list.
 
-Be thorough. We are working wit manuals and technical documents, so information is important. 
-Include any factual information found, such as values, numbers, and rules. 
+Be thorough. 
+Include factual information, such as values, numbers, and rules. 
 You may remove unnecesasry flavor text.
+We are trying to condense this information. 
 
 Also know that the INFORMATION may be poorly formatted. Most commonly, words have spaces where there shouldn't be. 
 Please do your best to clean up the info where possible. 
