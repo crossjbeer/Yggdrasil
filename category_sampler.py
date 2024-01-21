@@ -35,6 +35,19 @@ Now please take a deep breath. Rembember, you are the CATEGORIZER. You were made
 Let's get started! 
 """
 
+DISAMBIGUATOR = """You are the DISAMBIGUATOR.
+Your job is to disambiguate the CATEGORIES that the CATEGORIZER has built.
+A CATEGORY is an an overarching theme that can be used to describe some information seen in a DOCUMENT. 
+
+You will be provided with the following: 
+- A list of CATEGORIES that the CATEGORIZER has built.
+- The name of the DOCUMENT that the CATEGORIZER has built the CATEGORIES from.
+- A DESCRIPTION of the DOCUMENT that the CATEGORIZER has built the CATEGORIES from.
+
+Your job is to disambiguate the CATEGORIES.
+Please return the disambiguated CATEGORIES as a BULLETED LIST.
+"""
+
 def make_parser():
     parser = argparse.ArgumentParser(description='Build corpus of category names.')
 
@@ -48,6 +61,28 @@ def make_parser():
     parser = parser_doc(parser)
     
     return(parser)
+
+def ask_disambiguator(categories, chatter, doc_name, doc_desc, disambiguator_prompt = DISAMBIGUATOR, *args, **kwargs):
+    """
+    Pass a list of CATEGORIES to the DISAMBIGUATOR. 
+    """
+
+    messages = [] 
+    messages.append(chatter.getSysMsg(disambiguator_prompt))
+
+    msg = "CATEGORIES:\n"
+    for i, category in enumerate(categories):
+        msg += f"{i+1}. {category}\n"
+    messages.append(chatter.getSysMsg(msg))
+
+    messages.append(chatter.getSysMsg(f"DOCUMENT: {doc_name}"))
+    messages.append(chatter.getSysMsg(f"DESCRIPTION: {doc_desc}"))
+
+    chatter.printMessages(messages)
+    input() 
+
+    reply = chatter(messages)
+    return(parse_bulleted_list(reply))
 
 def ask_categorizer(chunk_sample, chatter, doc_name, doc_desc, categorizer_prompt = CATEGORIZER, *args, **kwargs):
     """
@@ -97,6 +132,14 @@ def main():
     for i, category in enumerate(all_categories):
         print(f"{i+1}. {category}")
     print("***")
+
+    disambiguated_categories = ask_disambiguator(all_categories, chatter, **vars(args))
+
+    print("Disambiguated Categories")
+    for i, category in enumerate(disambiguated_categories):
+        print(f"{i+1}. {category}")
+
+        
 
 if(__name__ == "__main__"):
     main()
