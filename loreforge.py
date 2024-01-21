@@ -25,7 +25,8 @@ Write them as a bulleted list.
 Include all factual information, such as values, numbers, and rules. 
 You may remove unnecesasry flavor text.
 
-The INFORMATION may be poorly formatted. Most commonly, words have spaces where there shouldn't be. 
+The INFORMATION may be poorly formatted. 
+Most commonly, words have spaces where there shouldn't be. 
 Please do your best to clean up the info where possible. 
 
 For each NAMED ENTITY, you should output with the following format: 
@@ -34,6 +35,9 @@ For each NAMED ENTITY, you should output with the following format:
 - <Relevant information 2>
 - ... 
 - <Relevant information N>
+
+DO NOT: 
+- Make sub-entities. ONLY MAKE ENTITIES. 
 
 Each <ENTITY> should be lowercase and use underscores instead of spaces.
 
