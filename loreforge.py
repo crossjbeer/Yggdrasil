@@ -346,9 +346,9 @@ def main():
     script = Scripter()
     df = script.loadTxt(args.path, parseOnSentence=True)
 
-    for line in df.text: 
-        print(line)
-        input() 
+    #for line in df.text: 
+    #    print(line)
+    #    input() 
 
     token_chunks = script.splitDFIntoTokenChunks(df, args.token_lim, lag=args.lag)
 
