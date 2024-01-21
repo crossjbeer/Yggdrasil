@@ -178,9 +178,6 @@ def entitymaster_step(info, chatter, doc_name=None, doc_desc=None, entitymaster_
     messages.append(chatter.getUsrMsg(prompt))
     reply = chatter(messages)
 
-    #print(reply)
-    #input("EM REPLY ^^")
-
     reply = parse_entitymaster(reply)
 
     return(reply)
@@ -213,7 +210,7 @@ def disambiguator_step(named_entities, lore_entries, chatter, disambiguator_prom
 
     reply = parse_bulleted_list(reply)
 
-    reply = [i.split(':')[-1].strip() for i in reply]
+    reply = [i.split(': ')[-1].strip() for i in reply]
 
     print(reply)
     input("PARSE REPLY &")
@@ -315,9 +312,6 @@ def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, e
     else: 
         print("Named Entities:")
         for named_entity, info in named_entities.items():
-            print("Entity: {}".format(named_entity))
-            print("Info:\n{}".format("\n".join(info)))
-            
             if(len(info)):
                 print("Creating new lore entry for {}".format(named_entity))
                 pth = os.path.join(lore_dir, named_entity+'.txt')
