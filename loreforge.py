@@ -69,21 +69,28 @@ Output your response as a BULLETED LIST, where each bullet point is a LORE ENTRY
 """
 
 DISAMBIGUATOR = """You are the DISAMBIGUATOR.
-Your job is to place NAMED ENTITIES into appropriate FILES. 
+Your job is to assign NAMED ENTITIES to FILES. 
+NAMED ENTITIES are PEOPLE, PLACES, THINGS, and IDEAS. 
 
-NAMED ENTITIES are entities identitied from a snippet of INFORMATION. 
-You may be provided with a DOCUMENT NAME, the name of the document the INFORMATION was taken from.
-You may also be provided with a DOCUMENT DESCRIPTION, a short description of the document the INFORMATION was taken from.
+You will be provided with a list of NAMED ENTITIES.
+You will also be provided with a list of FILES.
+File names are named entities. 
+For instance, a file named 'dogs' contains information about dogs. 
 
-Each FILE in FILES is a .txt document defining information about a NAMED ENTITY.
-For instance, dogs.txt may contain any information found from the DOCUMENT related to dogs. 
+If you were to be provided with the NAMED ENTITY 'dog', you should assign it to the file 'dogs'.
+However, if you were provided with the NAMED ENTITY 'doberman', you should assign it to the file 'doberman'.
+Maintain file name conventions. 
+They should be lowercase, and use underscores instead of spaces.
 
-You should decide to which FILE each NAMED ENTITY should be assigned. 
-If no appropriate FILE exists, you should create a new one.
-FILES all end with .txt. They should use underscores instead of spaces. They should be all lowercase. 
+You may also be provided with: 
+- DOCUMENT NAME: The name of the document the ENTITIES were taken from.
+- DOCUMENT DESCRIPTION: A short description of the document. 
 
-For each NAMED ENTITY, assign a FILE.  
-Output your response as a BULLETED LIST, with as many FILES as NAMED ENTITIES. 
+For each NAMED ENTITY, you decide if an appropriate FILE exists. 
+If not, use the name of the NAMED ENTITY to create a new FILE.
+If a FILE exists, assign the NAMED ENTITY to that FILE.
+
+Output your response as a bulleted list, with as many bullets as NAMED ENTITIES.
 """
 
 FORGE_MASTER = """You are the FORGE MASTER. 
@@ -130,14 +137,11 @@ def parse_entitymaster(reply):
     entity = None 
     for line in reply:
         if re.match(r'^(\t*-|-)', line):
-            print('LINE: {}'.format(line))
             if line.startswith('\t'):
                 line = line.lstrip('\t')
                 line = line.strip() 
             line = line.lstrip('-')
             line = line.strip() 
-
-            print("Processed Line: {}".format(line))
 
             if(line.startswith('Entity:')):
                 entity = line.split('Entity:')[1].strip()
@@ -190,11 +194,14 @@ def disambiguator_step(named_entities, lore_entries, chatter, disambiguator_prom
 
     reply = chatter(messages)
 
-    #print(reply)
-    #input("DIS REPLY ^^")
+    print(reply)
+    input("DIS REPLY ^^")
 
     reply = parse_bulleted_list(reply)
-    reply = [i.split('.')[0] if i.endswith('.txt') else i for i in reply]
+    #reply = [i.split('.')[0] if i.endswith('.txt') else i for i in reply]
+
+    print(reply)
+    input("PARSE REPLY &")
 
     return(reply)
 
@@ -244,6 +251,11 @@ def forgemaster_step(named_entities, info, chatter, forgemaster_prompt = FORGE_M
 def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, entitymaster_prompt = ENTITY_MASTER, disambiguator_prompt=DISAMBIGUATOR, forgemaster_prompt=FORGE_MASTER, forgemaster_entities=5, *args, **kwargs):
     color = cc() 
     existing_lore = os.listdir(lore_dir)
+    existing_lore = [i.split('.')[0] for i in existing_lore if i.endswith('.txt')]
+
+    print("Existing Lore:")
+    print(existing_lore)
+    input('Continue?')
 
     # Ask the entity master for named entities in the given information
     print(color.pred('Grabbing Entities...'))
@@ -254,18 +266,22 @@ def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, e
         print("Entity: {}".format(named_entity))
         print("Info:\n{}".format("\n".join(info)))
         print()
-
     input() 
 
-    if(len(existing_lore)):
-        existing_lore = [i for i in existing_lore if i.endswith('.txt')]
-        existing_lore = [i.split('.')[0] for i in existing_lore]
+    entities = list(named_entities.keys())
+    for i in range(0, len(entities), forgemaster_entities):
+        current_entities = entities[i:min(i+forgemaster_entities, len(entities)-1)]
+        lore_entries = disambiguator_step(current_entities, existing_lore, chatter, disambiguator_prompt=disambiguator_prompt)
 
-        # Ask the disambiguator for lore entries for each named entity
-        print(color.pred('Disambiguating Entities...')) 
-        named_entities = disambiguator_step(named_entities, existing_lore, chatter, disambiguator_prompt=disambiguator_prompt)
+        print("Lore Entries:")
+        print(lore_entries)
 
-        #input() 
+        for entity, lore_entry in zip(current_entities, lore_entries):
+            pth = os.path.join(lore_dir, lore_entry+'.txt')
+
+            with open(pth, 'a') as f:
+                f.write('\n'+entity)
+                f.write('\n'+'\n'.join(named_entities[entity]))
 
     print("Named Entities:")
     for ne in named_entities: 
