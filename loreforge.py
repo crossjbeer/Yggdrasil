@@ -30,7 +30,8 @@ You may remove unnecesasry flavor text.
 We are trying to condense this information. 
 
 DO NOT MAKE 'sub entities'.
-Instead, just make another named-entity. 
+There is no such thing as a Sub-Entity in our framework. 
+Instead, just make another 'Entity'. 
 
 Also know that the INFORMATION may be poorly formatted. Most commonly, words have spaces where there shouldn't be. 
 Please do your best to clean up the info where possible. 
