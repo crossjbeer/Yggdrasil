@@ -5,7 +5,7 @@ import os
 from chatter import Chatter 
 from scripter import Scripter 
 from noting import parse_bulleted_list
-from parsers import parser_gpt, parser_sql, valid_path, valid_path_build
+from parsers import parser_gpt, parser_sql, valid_path, valid_path_build, parser_doc
 from colorcodes import Colorcodes as cc 
 import re
 
@@ -124,13 +124,14 @@ def make_parser():
 
     parser.add_argument('-p', '--path', help='Path to the document to be parsed.', required=True, type=valid_path)
     parser.add_argument('--lore_dir_seed', help='Path to the folder where the lore entries will be stored. (Default: ./lore)', default='./lore', type=valid_path_build)
-    parser.add_argument('--token_lim', type=int, help='Chunk size the document will be split into. (Default: 1000)', default=1000)
-    parser.add_argument('--lag', type=int, help='Number of tokens to lag between chunks. (Default: 0)', default=0)
+    #parser.add_argument('--token_lim', type=int, help='Chunk size the document will be split into. (Default: 1000)', default=1000)
+    #parser.add_argument('--lag', type=int, help='Number of tokens to lag between chunks. (Default: 0)', default=0)
 
     parser.add_argument('--delete_lore', help='Delete existing lore entires', action='store_true')
 
     parser = parser_gpt(parser)
     parser = parser_sql(parser)
+    parser = parser_doc(parser)
 
     return(parser)
 
