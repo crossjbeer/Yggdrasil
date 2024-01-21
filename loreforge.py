@@ -159,6 +159,7 @@ def entitymaster_step(info, chatter, doc_name=None, doc_desc=None, entitymaster_
     input("EM REPLY ^^")
 
     reply = parse_entitymaster(reply)
+
     return(reply)
 
 def disambiguator_step(named_entities, lore_entries, chatter, disambiguator_prompt = DISAMBIGUATOR):
@@ -237,6 +238,7 @@ def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, e
     print(color.pred('Grabbing Entities...'))
     named_entities = entitymaster_step(info, chatter, doc_name=doc_name, doc_desc=doc_desc, entitymaster_prompt=entitymaster_prompt)
 
+    print("Named Entities:")
     for named_entity, info in named_entities.items():
         print("Entity: {}".format(named_entity))
         print("Info:\n{}".format("\n".join(info)))
