@@ -86,6 +86,7 @@ def main():
     for i, category in enumerate(all_categories):
         print(f"{i+1}. {category}")
 
-
+if(__name__ == "__main__"):
+    main()
 
 
