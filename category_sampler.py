@@ -134,11 +134,19 @@ def main():
         print(f"{i+1}. {category}")
     print("***")
 
-    disambiguated_categories = ask_disambiguator(all_categories, chatter, **vars(args))
+    #disambiguated_categories = ask_disambiguator(all_categories, chatter, **vars(args))
 
-    print("Disambiguated Categories")
-    for i, category in enumerate(disambiguated_categories):
-        print(f"{i+1}. {category}")
+    #print("Disambiguated Categories")
+    #for i, category in enumerate(disambiguated_categories):
+    #    print(f"{i+1}. {category}")
+
+    from scripter import jaccard_distance
+    for category in categories: 
+        all_distances = {i: jaccard_distance(category, i) for i in all_categories if i != category}
+
+        print(f"{category}:\n")
+        for i in sorted(all_distances, key=all_distances.get):
+            print(f"{i}: {all_distances[i]}")
 
 
 
