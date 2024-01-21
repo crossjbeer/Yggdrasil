@@ -130,10 +130,12 @@ def parse_entitymaster(reply):
     entity = None 
     for line in reply:
         if re.match(r'^(\t*-|-)', line):
+            print('LINE: {}'.format(line))
             if line.startswith('\t'):
                 line = line.lstrip('\t')
-            #else:
             line = line.lstrip('-')
+
+            print("Processed Line: {}".format(line))
 
             if(line.startswith('Entity:')):
                 entity = line.split('Entity:')[1].strip()
