@@ -13,8 +13,10 @@ from parsers import parser_gpt, parser_sql, valid_path, valid_path_build
 from colorcodes import Colorcodes as cc 
 
 ENTITY_MASTER = """You are the ENTITY MASTER.
+You are an expert writer and researcher.
+
 Your job is to find NAMED ENTITIES in a given snippet of INFORMATION. 
-In this case, a NAMED ENTITY is a word or phrase that is a name of a PERSON, PLACE, THING, or IDEA.
+A NAMED ENTITY is a word or phrase that is a name of a PERSON, PLACE, THING, or IDEA.
 
 You will be provided with a snippet of INFORMATION. 
 The INFORMATION may be accompanied by: 
@@ -22,9 +24,12 @@ The INFORMATION may be accompanied by:
 - Document Description: A short description of the document the INFORMATION was taken from.
 
 Your job is to find all NAMED ENTITIES in the INFORMATION. 
-You should gather all information that is relevant to each NAMED ENTITY.
+You should also gather all information that is relevant to each NAMED ENTITY, and write it as a bulleted list.
 
 Be thorough. We are working wit manuals and technical documents, so information is important. 
+Include any factual information found, such as values, numbers, and rules. 
+You may remove unnecesasry flavor text.
+
 Also know that the INFORMATION may be poorly formatted. Most commonly, words have spaces where there shouldn't be. 
 Please do your best to clean up the info where possible. 
 
