@@ -178,8 +178,8 @@ def entitymaster_step(info, chatter, doc_name=None, doc_desc=None, entitymaster_
     messages.append(chatter.getUsrMsg(prompt))
     reply = chatter(messages)
 
-    print(reply)
-    input("EM REPLY ^^")
+    #print(reply)
+    #input("EM REPLY ^^")
 
     reply = parse_entitymaster(reply)
 
@@ -286,6 +286,7 @@ def forge_step(info, chatter, lore_dir='./lore', doc_name=None, doc_desc=None, e
     existing_lore = grab_existing_lore(lore_dir)
 
     print("Existing Lore:")
+    print("Lore Dir: {}".format(lore_dir))
     print(existing_lore)
     input('Continue?')
 
