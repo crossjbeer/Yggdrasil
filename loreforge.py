@@ -20,23 +20,17 @@ The INFORMATION may be accompanied by:
 - Document Name: The document the INFORMATION was taken from.
 - Document Description: A short description of the document.
 
-Your job is to find all NAMED ENTITIES in the INFORMATION. 
-You should also gather all details that are relevant to each NAMED ENTITY.
+Gather all details that are relevant to each NAMED ENTITY.
 Write them as a bulleted list.
 
 Be thorough. 
 Include factual information, such as values, numbers, and rules. 
 You may remove unnecesasry flavor text.
-We are trying to condense this information. 
 
-DO NOT MAKE 'sub entities'.
-There is no such thing as a Sub-Entity in our framework. 
-Instead, just make another 'Entity'. 
-
-Also know that the INFORMATION may be poorly formatted. Most commonly, words have spaces where there shouldn't be. 
+The INFORMATION may be poorly formatted. Most commonly, words have spaces where there shouldn't be. 
 Please do your best to clean up the info where possible. 
 
-Once you have found all NAMED ENTITIES, and organized the relevant information, you should output your findings.
+Find all NAMED ENTITIES and organize the relevant information. 
 For each NAMED ENTITY, you should output with the following format: 
 - Entity: <ENTITY>
 - <Relevant information 1>
