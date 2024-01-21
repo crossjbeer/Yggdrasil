@@ -129,14 +129,14 @@ def parse_entitymaster(reply):
         if re.match(r'^(\t*-|-)', line):
             if line.startswith('\t'):
                 line = line.lstrip('\t')
-            else:
-                line = line.lstrip('-')
-                
-            if entity:
-                named_entities[entity].append(line)
-            else:
-                entity = line
+            #else:
+            line = line.lstrip('-')
+
+            if(line.startswith('Entity:')):
+                entity = line.split('Entity:')[1].strip()
                 named_entities[entity] = []
+            elif(entity):
+                named_entities[entity].append(line)
 
     return named_entities
 
