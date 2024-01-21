@@ -155,6 +155,9 @@ def entitymaster_step(info, chatter, doc_name=None, doc_desc=None, entitymaster_
     messages.append(chatter.getUsrMsg(prompt))
     reply = chatter(messages)
 
+    print(reply)
+    input("EM REPLY ^^")
+
     reply = parse_entitymaster(reply)
     return(reply)
 
