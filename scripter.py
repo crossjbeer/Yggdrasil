@@ -175,7 +175,7 @@ class Scripter:
                     else:
                         current_sentence += char
                 if current_sentence:
-                    sentences.append(current_sentence.strip())
+                    sentences.append(current_sentence.strip()+'\n')
             else:
                 sentences.append(line)
 
