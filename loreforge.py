@@ -125,8 +125,8 @@ def parse_entitymaster(reply):
     reply = reply.split('\n')
     entity = None 
     for line in reply:
-        if(line.startswith('Entity:')):
-            entity = line.split('Entity:')[1].strip()
+        if(line.startswith('- Entity:')):
+            entity = line.split('- Entity:')[1].strip()
             named_entities[entity] = []
 
         elif(entity and line.startswith('- ')):
@@ -142,7 +142,6 @@ def entitymaster_step(info, chatter, doc_name=None, doc_desc=None, entitymaster_
     We return these entities as a list. 
     """
 
-    color = cc() 
     messages = [chatter.getSysMsg(entitymaster_prompt)]
 
     prompt = """Information:\n{}""".format(info)
