@@ -346,7 +346,7 @@ def main():
             os.remove(os.path.join(args.lore_dir, f)) if f.endswith('.txt') else None
     
     script = Scripter()
-    df = script.loadTxt(args.path)
+    df = script.loadTxt(args.path, parseOnSentence=True)
     token_chunks = script.splitDFIntoTokenChunks(df, args.token_lim, lag=args.lag)
 
     chatter = Chatter(args.model)

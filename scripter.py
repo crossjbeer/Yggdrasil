@@ -362,7 +362,6 @@ class Scripter:
 
     def combineRowList(self, row_list, name_dict={}):
         combined_text = ''  # Initialize an empty string for combined text
-        
         current_speaker = None  # Initialize a variable to track the current speaker
         
         for speaker_class, text in row_list:
