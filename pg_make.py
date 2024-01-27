@@ -1,21 +1,22 @@
 import argparse
-from pg_chat import connect
 from pgvector.psycopg2 import register_vector
+
+from pg_utils import connect
+from parsers import parser_sql
 
 def make_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--host", help="Database host (Default: localhost)", default="localhost", type=str)
-    parser.add_argument("--port", help="Database port (Default: '')", default="", type=str)
-    parser.add_argument("--database", help="Database name (Default: yggy)", default="yggy", type=str)
-    parser.add_argument("--user", help="Database user (Default: crossland)", default="crossland", type=str)
-    parser.add_argument("--password", help="Database password (Default: pass)", default="pass", type=str)
+    
+    parser.add_argument('--notes', action='store_true', help='Create note table')
+    parser.add_argument('--chats', action='store_true', help='Create chat table')
+    parser.add_argument('--chat_text', action='store_true', help='Create chat text table')
+    parser.add_argument('--users', action='store_true', help='Create user table')
+    parser.add_argument('--planarverses', action='store_true', help='Create planarverse table')
 
-    parser.add_argument('--no_note', action='store_true', help='Do not create note table')
-    parser.add_argument('--no_chat', action='store_true', help='Do not create chat table')
-    parser.add_argument('--no_chat_text', action='store_true', help='Do not create chat text table')
+    parser = parser_sql(parser)
     return(parser)
 
-def create_note_table(conn):
+def create_note(conn):
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE notes (
@@ -31,7 +32,7 @@ def create_note_table(conn):
     conn.commit()
     cursor.close()
 
-def create_chats_table(conn):
+def create_chats(conn):
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE chats (
@@ -45,7 +46,7 @@ def create_chats_table(conn):
     conn.commit()
     cursor.close()
 
-def create_chat_text_table(conn):
+def create_chat_text(conn):
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE chat_text (
@@ -61,11 +62,78 @@ def create_chat_text_table(conn):
     conn.commit()
     cursor.close()
 
+def create_users(conn):
+    cursor = conn.cursor()
+    if(not cursor):
+        print("Failed to create cursor")
+        return(None)
+    
+    cursor.execute("""CREATE TABLE users (
+user_id SERIAL PRIMARY KEY,
+date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+username VARCHAR(255) UNIQUE NOT NULL,
+passhash VARCHAR(255) NOT NULL,
+salt VARCHAR(255) NOT NULL,
+email VARCHAR(255) UNIQUE NOT NULL,
+first_name VARCHAR(255),
+last_name VARCHAR(255),
+bio TEXT,
+profile_pic TEXT,
+last_login TIMESTAMP,
+last_ip VARCHAR(255),
+last_session VARCHAR(255),
+is_admin BOOLEAN DEFAULT FALSE,
+is_active BOOLEAN DEFAULT TRUE,
+is_verified BOOLEAN DEFAULT FALSE,
+is_staff BOOLEAN DEFAULT FALSE,
+is_superuser BOOLEAN DEFAULT FALSE,
+is_banned BOOLEAN DEFAULT FALSE)""")
+    
+    conn.commit()
+    cursor.close()
+    return()
+
+def create_planarverses(conn):
+    cursor = conn.cursor()
+    if(not cursor):
+        print("Failed to create cursor")
+        return(None)
+    
+    cursor.execute("""CREATE TABLE planarverses (
+        verse_id SERIAL PRIMARY KEY,
+        date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,   
+        user_id INT REFERENCES users(user_id),
+        title VARCHAR(255),
+        description TEXT,
+        planes_n INT
+    )""")
+    
+    conn.commit()
+    cursor.close()
+    return() 
+
+def create_planes(conn):
+    cursor = conn.cursor()
+    if(not cursor):
+        print("Failed to create cursor")
+        return(None)
+    
+    cursor.execute("""CREATE TABLE planes (
+plane_id SERIAL PRIMARY KEY,
+verse_id INT REFERENCES planarverses(verse_id),
+plane_name VARCHAR(255),
+description TEXT,
+plane_n INT)""")
+    
+    conn.commit()
+    cursor.close()
+    return()
+
+
 def main():
     parser = make_parser()
     args = parser.parse_args()
 
-    #conn = psycopg2.connect(**vars(args))
     conn = connect(**vars(args))
     if(not conn):
         print("Unable to connect to database")
@@ -73,17 +141,25 @@ def main():
 
     register_vector(conn)
 
-    if(not args.no_note):
+    if(args.notes and args.notes_table):
         print("Building Notes Table")
-        create_note_table(conn)
+        create_note(conn)
 
-    if(not args.no_chat):
+    if(args.chats and args.chats_table):
         print("Building Chats Table")
-        create_chat_table(conn)
+        create_chats(conn)
 
-    if(not args.no_chat_text):
+    if(args.chat_text and args.chat_text_table):
         print("Building Chats Text Table")
-        create_chat_text_table(conn)
+        create_chat_text(conn)
+
+    if(args.users and args.users_table):
+        print("Building Users Table")
+        create_users(conn)
+
+    if(args.planarverses and args.planarverses_table):
+        print("Building Planarverses Table")
+        create_planarverses(conn)
 
     conn.close()
 
