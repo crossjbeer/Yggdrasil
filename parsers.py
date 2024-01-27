@@ -18,7 +18,11 @@ def parser_sql(parser):
     parser.add_argument('-db', '--database', help='Postgres Database (Default: yggdrasil)', type=str, default='yggdrasil')
     
     parser.add_argument('--transcript_table', help='Postgres transcript table (Default: transcript)', default='transcript', type=str)
-    parser.add_argument('--note_table', help='Postgres note table (Default: notes)', default='notes', type=str)
+    parser.add_argument('--notes_table', help='Postgres note table (Default: notes)', default='notes', type=str)
+    parser.add_argument('--chats_table', help='Postgres chat table (Default: chats)', default='chats', type=str)
+    parser.add_argument('--chat_text_table', help='Postgres chat text table (Default: chat_text)', default='chat_text', type=str)
+    parser.add_argument('--users_table', help='Postgres users table (Default: users)', default='users', type=str)
+    parser.add_argument('--planarverses_table', help='Postgres planarverses table (Default: planarverses)', default='planarverses', type=str)
 
     return(parser)
 
