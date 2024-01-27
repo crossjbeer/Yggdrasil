@@ -1,21 +1,12 @@
 import psycopg2
 from psycopg2 import sql
-
 import openai
 import os 
+from pg_utils import connect 
 
 from chatter import Chatter
 
 openai.api_key = os.getenv('OPENAI_AUTH')
-
-def connect(host, port, user, password, database, *args, **kwargs):
-    # Connect to the PostgreSQL database
-    try:
-        connection = psycopg2.connect(host=host, port=port, user=user, password=password, database=database )
-        return connection
-    except (Exception, psycopg2.Error) as error:
-        print("Error while connecting to PostgreSQL:", error)
-        return None
 
 def list_titles(connection, table_name='chats', title_col='title'):
     # List titles from the specified table
@@ -47,7 +38,6 @@ def ids_and_titles(connection, chat_table='chats', id_col='chat_id', title_col='
         print("Error fetching titles:", e)
         return None
     
-
 def grab_chat(connection, chat_id, chat_text_table='chat_text', chat_id_col='chat_id', text_col='text', role_col='role', text_id_col='text_id', *args, **kwargs):
     # Get text from the specified table with the given parameters
     try:
@@ -78,8 +68,6 @@ def get_last_ind(connection, chat_id):
     except psycopg2.Error as e:
         connection.rollback()
         print("Error appending message:", e)
-
-
 
 def append_message(connection, chat_id, text, role, table_name='chat_text', chat_id_col='chat_id', text_col='text', role_col='role'):
     # Append a new message to the specified table with the given parameters
