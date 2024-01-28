@@ -171,9 +171,9 @@ Feel free to return multiple forms of the same question.
 """
 
 TOOLS = {'notes':'Notes written by the GAME MASTER (GM) of a dnd campaign. Useful for specific world information, NPCs, lore, etc. Not useful for rules. This should likely be referenced in most cases.', 
-         'players handbook':'All information one must know to be a Dungeon and Dragons PLAYER. Includes rules for building characters, designing backgrounds, combat, spells, etc.', 
-         'dungeon masters guide':'All information required to be a Dungeons and Dragons GAME MASTER (GM). Contains rules for building encounters, designing campaigns, etc.',
-         'build a character': 'A small white-page sheet containing 10 steps on how to build a character.'
+         'players_handbook':'All information one must know to be a Dungeon and Dragons PLAYER. Includes rules for building characters, designing backgrounds, combat, spells, etc.', 
+         'dungeon_masters_guide':'All information required to be a Dungeons and Dragons GAME MASTER (GM). Contains rules for building encounters, designing campaigns, etc.',
+         'build_a_character': 'A small white-page sheet containing 10 steps on how to build a character.'
          }
 
 
@@ -379,6 +379,9 @@ def ask_igor_small(prompt, igor_notes, chatter=None, model='gpt-3.5-turbo', igor
     #    color = Colorcodes()
     #    print(color.pbold(color.pred('\tSummarizing with IGOR...')))
 
+    #chatter.printMessages(igor_msg)
+    #input("IGOR SUM")
+
     igor_reply = chatter.passMessagesGetReply(igor_msg)
 
     return(igor_reply)
@@ -393,6 +396,8 @@ def ask_loremaster(prompt, igor_reply, chatter, messages=[], loremaster_prompt =
     if verbose:
         color = Colorcodes()
         print(color.pbold(color.pred('\tPassing to LORE MASTER...')))
+        #chatter.printMessages(messages)
+        #input()
 
     reply = chatter.passMessagesGetReply(messages)
     return(reply, messages)
@@ -538,6 +543,8 @@ def tokenmaster_step(prompt, model, chatter, embedder, verbose, total_tokens = 5
         print(color.pgreen(f"\t\tTool {i+1}: {sortkey} [{tm_reply[sortkey]} Tokens]"))
 
     for i, sortkey in enumerate(sorted_keys):
+        if(tm_reply[sortkey] == 0):
+            continue
         note_vector = info_grab(prompt, tm_reply[sortkey], embedder, namespace=sortkey, *args, **kwargs)
         igor_info = organize_information_from_vectors(note_vector, knowledge_source=sortkey, knowledge_source_description=tools[sortkey])
 
@@ -608,11 +615,12 @@ def tokenmaster(model, query, nvector, embedder, loremaster=LORE_MASTER, igor=IG
         if(prompt is None):
             prompt = chatter.usrprompt()
 
-        qm_reply = ask_querymaster(prompt, chatter, querymaster_prompt=QUERY_MASTER, verbose=verbose)
+        qm_reply = prompt 
+        #qm_reply = ask_querymaster(prompt, chatter, querymaster_prompt=QUERY_MASTER, verbose=verbose)
 
-        if(verbose):
-            print(color.pgreen(f"\tOriginal Prompt:\n- {prompt}"))
-            print(color.pbold(color.pgreen(f"\tImproved Prompt:\n- {qm_reply}")))
+        #if(verbose):
+        #    print(color.pgreen(f"\tOriginal Prompt:\n- {prompt}"))
+        #    print(color.pbold(color.pgreen(f"\tImproved Prompt:\n- {qm_reply}")))
 
         prompt = qm_reply 
 
