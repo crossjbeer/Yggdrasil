@@ -12,6 +12,8 @@ def make_parser():
     parser.add_argument('--chat_text', action='store_true', help='Create chat text table')
     parser.add_argument('--users', action='store_true', help='Create user table')
     parser.add_argument('--planarverses', action='store_true', help='Create planarverse table')
+    parser.add_argument('--planes', action='store_true', help='Create plane table')
+    parser.add_argument('--sessions', action='store_true', help='Create session table')
 
     parser = parser_sql(parser)
     return(parser)
@@ -83,7 +85,7 @@ last_login TIMESTAMP,
 last_ip VARCHAR(255),
 last_session VARCHAR(255),
 is_admin BOOLEAN DEFAULT FALSE,
-is_active BOOLEAN DEFAULT TRUE,
+is_active BOOLEAN DEFAULT FALSE,
 is_verified BOOLEAN DEFAULT FALSE,
 is_staff BOOLEAN DEFAULT FALSE,
 is_superuser BOOLEAN DEFAULT FALSE,
@@ -101,11 +103,11 @@ def create_planarverses(conn):
     
     cursor.execute("""CREATE TABLE planarverses (
         verse_id SERIAL PRIMARY KEY,
-        date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,   
-        user_id INT REFERENCES users(user_id),
+        date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,   
+        user_id INT REFERENCES users(user_id) NOT NULL,
         title VARCHAR(255),
         description TEXT,
-        planes_n INT
+        planes_n INT DEFAULT 0
     )""")
     
     conn.commit()
@@ -121,9 +123,29 @@ def create_planes(conn):
     cursor.execute("""CREATE TABLE planes (
 plane_id SERIAL PRIMARY KEY,
 verse_id INT REFERENCES planarverses(verse_id),
-plane_name VARCHAR(255),
-description TEXT,
-plane_n INT)""")
+title VARCHAR(255),
+description TEXT)""")
+    
+    conn.commit()
+    cursor.close()
+    return()
+
+def create_sessions(conn):
+    cursor = conn.cursor()
+    if(not cursor):
+        print("Failed to create cursor")
+        return(None)
+    
+    cursor.execute("""CREATE TABLE sessions (
+session_id SERIAL PRIMARY KEY,
+date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+user_id INT REFERENCES users(user_id) NOT NULL,
+ip VARCHAR(255),
+session VARCHAR(255),
+last_login TIMESTAMP,
+last_ip VARCHAR(255),
+last_session VARCHAR(255));
+""")
     
     conn.commit()
     cursor.close()
@@ -160,6 +182,15 @@ def main():
     if(args.planarverses and args.planarverses_table):
         print("Building Planarverses Table")
         create_planarverses(conn)
+
+    if(args.planes and args.planes_table):
+        print("Building Planes Table")
+        create_planes(conn)
+
+    if(args.sessions and args.sessions_table):
+        print("Building Sessions Table")
+        create_sessions(conn)
+
 
     conn.close()
 
