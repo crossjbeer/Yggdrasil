@@ -4,9 +4,16 @@ from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 import os
 import json 
+import argparse 
 
 # Google Docs API scopes
 SCOPES = ['https://www.googleapis.com/auth/documents.readonly']
+
+def make_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', '--force', help='Force overwrite of existing files.', action='store_true')
+    return(parser)
+
 
 def authenticate():
     creds = None
@@ -52,6 +59,9 @@ def download_doc(service, doc_id, output_file):
 
 
 def main():
+    parser = make_parser() 
+    args = parser.parse_args()
+
     creds = authenticate()
     service = build('docs', 'v1', credentials=creds)
 
@@ -59,6 +69,11 @@ def main():
 
     for doc_name, doc_id in docs_ids.items():
         output_file = f'./notes/{doc_name}'
+
+        if(os.path.exists(output_file) and not args.force):
+            print(f'File {output_file} already exists, skipping.')
+            continue
+
         download_doc(service, doc_id, output_file)
         print(f'Successfully downloaded {doc_name} to {output_file}')
 
