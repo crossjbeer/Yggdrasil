@@ -23,6 +23,8 @@ def parser_sql(parser):
     parser.add_argument('--chat_text_table', help='Postgres chat text table (Default: chat_text)', default='chat_text', type=str)
     parser.add_argument('--users_table', help='Postgres users table (Default: users)', default='users', type=str)
     parser.add_argument('--planarverses_table', help='Postgres planarverses table (Default: planarverses)', default='planarverses', type=str)
+    parser.add_argument('--planes_table', help='Postgres planes table (Default: planes)', default='planes', type=str)
+    parser.add_argument('--sessions_table', help='Postgres sessions table (Default: sessions)', default='sessions', type=str)
 
     return(parser)
 
