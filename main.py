@@ -9,7 +9,7 @@ from colorcodes import Colorcodes
 #from parsers import make_parser_gpt_sql
 from pg_vector import grab_k
 from pg_embed import embed 
-from pg_chat import start_chat, connect
+from pg_chat import start_chat, append_message, connect
 from parsers import parser_gpt, parser_sql 
 
 
@@ -148,7 +148,7 @@ If the ANSWER adequately answers the USER QUERY, please write 'adequate'.
 Otherwise, if you find the question has not been adequately answered, please return ANY AND ALL criticism as a BULLETED LIST.
 """
 
-QUERY_MASTER = """You are the QUERY MASTER. 
+QUERY_MASTER1 = """You are the QUERY MASTER. 
 Your job is to improve queries. 
 
 You will be provided with a USER QUERY.
@@ -169,6 +169,37 @@ Below are your requirements:
 Remember, you should add detail where possible, instead of removing detail.
 Feel free to return multiple forms of the same question. 
 """
+
+QUERY_MASTER = """You are the QUERY MASTER.
+Your job is to improve queries. 
+A query is considered 'improved' when it contains more appropriate contextual information. 
+But what does this mean? 
+
+Your improved queries will help an Information Retrieval System (IRS). 
+This IRS depends on conetextual information that the user may not provide in their query alone.
+
+As an initial query, the user asks "What is the name of the dragon in the cave?".
+The IRS returns that the dragon in the cave is named 'Smaug'.
+
+Next, the user asks: "And what does he like to eat?"
+This lacks sufficient context for the IRS.
+The system will not know who 'he' is.
+So the question would be better phrased as "What does Smaug like to eat?". 
+
+Please also present several iterations of the question in your response.
+This will give the IRS more opportunities to find the correct information.
+
+Other example improvements to "And what does he like to eat?" include: 
+1) "What does the dragon in the cave, Smaug, like to eat?"
+2) "What sorts of foods does Smaug eat?"
+
+You will be presented with a list of USER QUERIES, and a NEW QUERY. 
+Please return the NEW QUERY and NOTHING ELSE.
+
+Now please take a seat, get a sip of coffee, take a deep breath, and get ready to improve some queries!
+You are a valuable member of our team and I look forward to seeing what you can do.
+"""
+
 
 TOOLS = {'notes':'Notes written by the GAME MASTER (GM) of a dnd campaign. Useful for specific world information, NPCs, lore, etc. Not useful for rules. This should likely be referenced in most cases.', 
          'players_handbook':'All information one must know to be a Dungeon and Dragons PLAYER. Includes rules for building characters, designing backgrounds, combat, spells, etc.', 
@@ -265,9 +296,14 @@ def info_grab(prompt, nvec, embedder, namespace=None, *args, **kwargs):
     return(vec)
 
 
-def ask_querymaster(prompt, chatter, querymaster_prompt=QUERY_MASTER, verbose=False):
+def ask_querymaster(prompt, previous_prompts, chatter, querymaster_prompt=QUERY_MASTER, verbose=False):
     color = Colorcodes()
     qm_msg = [chatter.getSysMsg(querymaster_prompt)]
+
+    msg = f"PREVIOUS PROMPTS:\n"
+    for i, prompt in enumerate(previous_prompts):
+        msg += f"{i+1}) {prompt}\n"
+    qm_msg.append(chatter.getUsrMsg(msg))
 
     msg = f'USER QUERY: {prompt}'
     qm_msg.append(chatter.getUsrMsg(msg))
@@ -276,6 +312,9 @@ def ask_querymaster(prompt, chatter, querymaster_prompt=QUERY_MASTER, verbose=Fa
         print(color.pbold(color.pred('\tPassing to QUERY MASTER...')))
 
     qm_reply = chatter.passMessagesGetReply(qm_msg)
+
+    print(qm_reply)
+    input()
 
     return(qm_reply)
 
@@ -315,8 +354,6 @@ def ask_tokenmaster(user_query, chatter, tools, tokens, toolmaster=TOOLMASTER_TO
 
     if(verbose):
         print(color.pbold(color.pred('\tPassing to Token Master...')))
-        #chatter.printMessages(tm_msg)   
-        #input() 
 
     tm_reply = chatter.passMessagesGetReply(tm_msg)
     tm_reply = parse_bulleted_list(tm_reply)
@@ -356,7 +393,7 @@ def ask_igor(prompt, embedder='text-embedding-ada-002', model='gpt-3.5-turbo', n
 
     if(verbose):
         if(namespace):
-            print(color.pred(f'\tSummarizing {namespace} with IGOR...'))
+            print(color.pred(f'\tSummarizing {color.pbold(namespace)} with IGOR...'))
         else:
             print(color.pbold(color.pred('\tSummarizing with IGOR...')))
 
@@ -558,7 +595,6 @@ def tokenmaster_step(prompt, model, chatter, embedder, verbose, total_tokens = 5
     for note in igor_summaries: 
         full_igor_summary += f"Knowledge Source: {note}\nSource Description: {tools[note]}\n\nIgor Summary:\n{igor_summaries[note]}\n\n"
 
-    #print("Full Igor Summary:\n", full_igor_summary)
     loremaster_reply, loremaster_msg = ask_loremaster(prompt, full_igor_summary, chatter, messages=loremaster_dialogue, verbose=verbose, loremaster_prompt=loremaster)
 
     return(loremaster_reply, loremaster_msg)
@@ -611,18 +647,17 @@ def tokenmaster(model, query, nvector, embedder, loremaster=LORE_MASTER, igor=IG
     loremaster_dialogue.append(chatter.getSysMsg(loremaster))
 
     prompt = query 
+    previous_prompts = [] 
+
     while True:
         if(prompt is None):
             prompt = chatter.usrprompt()
 
-        qm_reply = prompt 
-        #qm_reply = ask_querymaster(prompt, chatter, querymaster_prompt=QUERY_MASTER, verbose=verbose)
-
-        #if(verbose):
-        #    print(color.pgreen(f"\tOriginal Prompt:\n- {prompt}"))
-        #    print(color.pbold(color.pgreen(f"\tImproved Prompt:\n- {qm_reply}")))
-
-        prompt = qm_reply 
+        if(len(previous_prompts)):
+            previous_prompts.append(prompt)
+            prompt = ask_querymaster(prompt, previous_prompts, chatter, querymaster_prompt=QUERY_MASTER, verbose=verbose)
+        else:
+            previous_prompts.append(prompt)
 
         loremaster_reply, _ = tokenmaster_step(prompt, model, chatter, embedder, verbose, total_tokens=nvector, toolmaster=toolmaster, igor=igor, loremaster=loremaster, loremaster_dialogue=loremaster_dialogue, *args, **kwargs)
         loremaster_dialogue.append(chatter.getAssMsg(loremaster_reply))
@@ -660,9 +695,6 @@ def main():
     args = parser.parse_args() 
 
     yggy_print()
-
-    #noting(**vars(args))
-    #orchestrate(**vars(args))
     tokenmaster(**vars(args))
 
         
