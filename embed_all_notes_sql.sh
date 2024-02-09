@@ -13,7 +13,7 @@ for file in "$directory"/*.txt; do
         filename=$(basename "$file" .txt)
         
         # Run the embed.py command for the current file
-        python3 pg_embed.py --path "$file" --tokenlim 1000 --database yggdrasil --namespace notes
+        python3 pg_embed.py --path "$file" --tokenlim 1200 --database yggdrasil --namespace notes --lag 6 --embedding_model text-embedding-3-small
         
         # Optionally, you can print a message indicating which file is being processed
         echo "Processed: $filename"

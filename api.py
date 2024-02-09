@@ -6,13 +6,15 @@ import argparse
 #from parsers import make_parser_gpt_sql
 from parsers import parser_gpt, parser_sql
 
-from pg_chat import connect, grab_chat, start_chat, append_message
-from noting import ask_igor, ask_loremaster, orchestrate_step
+from pg_chat import connect, grab_chat, new_chat, append_message, recreate_loremaster_dialogue
+from main import yggy_step
 
 from chatter import Chatter 
 
 HOST = 'localhost'
 PORT = '5432'
+USER = 'crossland'
+PASSWORD = 'pass'
 DATABASE = 'yggdrasil'
 
 def make_parser():
@@ -115,57 +117,47 @@ def noting():
 
 
 yggy_blueprint = Blueprint('yggy', __name__)
-@noting_blueprint.route('/yggy', methods=['GET'])
+@yggy_blueprint.route('/yggy', methods=['GET'])
 def yggy():
-    prompt = request.args.get('prompt')
-    user = request.args.get('user')
-    password = request.args.get('password')
-    #campaign = request.args.get('campaign')
-
+    try:
+        data = request.args 
+    except Exception as e:
+        print(e)
+        return({'error':100, 'message':'Could not parse JSON data'})
+    
     print("Connecting to database...")
-    connection = connect(HOST, PORT, user, password, DATABASE)
+    connection = connect(HOST, PORT, USER, PASSWORD, DATABASE)
 
     if(not connection):
         return({'error':101, 'message':'Could not connect to database'})
+    
+    # Expected Params: 
+    prompt = data['prompt']
 
-    nvector = request.args.get('nvector')
-    if(not nvector):    
-        nvector = 10
-
-    embedder = request.args.get('embedder')
-    if(not embedder):
-        embedder = 'text-embedding-ada-002'
-
-    model = request.args.get('model')
-    if(not model):
-        model='gpt-3.5-turbo-1106'
-
-    chat_id = request.args.get('chat_id')
-    if(not chat_id):
-        try:
-            chat_id = start_chat(connection, prompt, role='user')
-            messages = [] 
-        except Exception as e:
-            return({'error':101, 'message':str(e)})
-    else:
-        try:
-            messages = grab_chat(connection, chat_id)
-        except Exception as e: 
-            return({'error':102, 'message':str(e)})
+    # Optional Params: 
+    #nvector = 10 if 'nvector' not in data else data['nvector']
+    model = 'gpt-3.5-turbo-1106' if 'model' not in data else data['model']
+    chat_id = new_chat(connection, prompt, 'yggy') if 'chat_id' not in data else data['chat_id']
 
     chatter = Chatter(model)
-    reply = orchestrate_step(prompt, model, chatter, nvector, embedder, verbose=False, loremaster_dialogue=messages, host=HOST, port=PORT, user=user, password=password, database=DATABASE)
 
+    loremaster_dialogue = [] 
+    if("chat_id" in data):
+        loremaster_dialogue = recreate_loremaster_dialogue(connection, chat_id)
 
+    append_message(connection, chat_id, prompt, 'user')
 
-    #append_message(connection, chat_id, messages[-1]['content'], role='user')
-    #append_message(connection, chat_id, loremaster_reply, role='assistant')
+    reply, _, associated_ids, _ = yggy_step(prompt, chatter, 'text-embedding-3-small', previous_prompts=[], verbose=False, loremaster_dialogue = loremaster_dialogue, connection=connection, host=HOST, port=PORT, user=USER, password=PASSWORD, database=DATABASE)
+
+    append_message(connection, chat_id, reply, 'assistant', associated_ids)
+
     return({'response':reply}, 200)
     
 
 
-app.register_blueprint(chat_blueprint)
-app.register_blueprint(noting_blueprint)
+##app.register_blueprint(chat_blueprint)
+##app.register_blueprint(noting_blueprint)
+app.register_blueprint(yggy_blueprint)
 if __name__ == '__main__':
     paresr = make_parser()
     args = parser.parse_args()

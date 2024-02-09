@@ -1,14 +1,3 @@
-"""
-I want to give this a .txt.
-We will chunk this up according to a 'token_lim'
-We will randomly sample n chunks. 
-We will pass the n chunks to a model, which will return a list of named entities. 
-We will do this m times, recording the named entities each time. 
-We will then take the union of all the named entities, and build a master list. 
-"""
-
-import os
-import re
 import random
 import argparse 
 
@@ -20,6 +9,7 @@ from loreforge import parse_bulleted_list
 CATEGORIZER = """You are the CATEGORIZER. 
 Your job is to build a list of CATEGORIES from chunks of a DOCUMENT. 
 A CATEGORY is an an overarching theme that can be used to describe some of the information seen in the DOCUMENT.
+Think of your CATEGORIES as an index for the DOCUMENT, constructed from the chunks of text in the DOCUMENT.
 
 You will be provided with the name of a DOCUMENT. 
 You will also be provided with a DESCRIPTION of the DOCUMENT.
@@ -35,7 +25,7 @@ Now please take a deep breath. Rembember, you are the CATEGORIZER. You were made
 Let's get started! 
 """
 
-DISAMBIGUATOR = """You are the DISAMBIGUATOR.
+DISAMBIGUATOR1 = """You are the DISAMBIGUATOR.
 Your job is to disambiguate the CATEGORIES that the CATEGORIZER has built.
 A CATEGORY is an an overarching theme that can be used to describe some information seen in a DOCUMENT. 
 
@@ -49,13 +39,27 @@ Make sure you write at least 250 categories.
 Please return the disambiguated CATEGORIES as a BULLETED LIST.
 """
 
+DISAMBIGUATOR = """You are the DISAMBIGUATOR. 
+Your job is to create a master list of categories from the CATEGORIES that the CATEGORIZER has built.
+
+You will be provided with the following: 
+- A list of CATEGORIES that the CATEGORIZER has built. 
+- The namof of the DOCUMENT that the CATEGORIZER has built the CATEGORIES from.
+- A DESCRIPTION of the DOCUMENT that the CATEGORIZER has built the CATEGORIES from.
+
+Your job is to create a master list of categories from the CATEGORIES that the CATEGORIZER has built.
+Make at least 50 categories. 
+All categories should be lowercase and use underscores instead of spaces. 
+Categories should be as general as possible. 
+Please return your categories as a BULLETED LIST. 
+
+"""
+
 def make_parser():
     parser = argparse.ArgumentParser(description='Build corpus of category names.')
 
-    #parser.add_argument('-p', '--path', type=valid_path, help='Path to a .txt file to categorize.')
     parser.add_argument('--num', type=int, default=5, help='Number of samples to take from the token chunks of the .txt file.')
     parser.add_argument('-r', '--reps', type=int, default=10, help='Number of times to sample from the .txt file.')
-    #parser.add_argument('--token_lim', type=int, default=750, help='Number of tokens to chunk the .txt file into.')
     parser.add_argument('--save_dir_seed', type=valid_path_build, default='./lore/', help='Directory to save the corpus to.')
 
     parser = parser_gpt(parser)
@@ -79,8 +83,8 @@ def ask_disambiguator(categories, chatter, doc_name, doc_desc, disambiguator_pro
     messages.append(chatter.getSysMsg(f"DOCUMENT: {doc_name}"))
     messages.append(chatter.getSysMsg(f"DESCRIPTION: {doc_desc}"))
 
-    chatter.printMessages(messages)
-    input() 
+    #chatter.printMessages(messages)
+    #input() 
 
     reply = chatter(messages)
     return(parse_bulleted_list(reply))
@@ -99,8 +103,8 @@ def ask_categorizer(chunk_sample, chatter, doc_name, doc_desc, categorizer_promp
     for i, chunk in enumerate(chunk_sample):
         messages.append(chatter.getSysMsg(f"CHUNK {i+1}:\n{chunk}"))
 
-    chatter.printMessages(messages)
-    input() 
+    #chatter.printMessages(messages)
+    #input() 
 
     reply = chatter(messages)
     return(parse_bulleted_list(reply))
@@ -114,8 +118,6 @@ def main():
 
     script = Scripter() 
     df = script.loadTxt(args.path, parseOnSentence=True)
-
-    #token_chunks = script.splitDFIntoTokenChunks(df, args.token_lim)
     token_chunks = script.tokenChunks(df, args.token_lim, args.lag)
 
     all_categories = []
@@ -132,21 +134,24 @@ def main():
     print("All Categories")
     for i, category in enumerate(all_categories):
         print(f"{i+1}. {category}")
-    print("***")
+    #print("***")
 
     #disambiguated_categories = ask_disambiguator(all_categories, chatter, **vars(args))
+    disambiguated_categories = ask_disambiguator(all_categories, Chatter('gpt-4'), **vars(args))
 
-    #print("Disambiguated Categories")
-    #for i, category in enumerate(disambiguated_categories):
-    #    print(f"{i+1}. {category}")
+    print("Disambiguated Categories")
+    for i, category in enumerate(disambiguated_categories):
+        print(f"{i+1}. {category}")
 
-    from scripter import jaccard_distance
-    for category in categories: 
-        all_distances = {i: jaccard_distance(category, i) for i in all_categories if i != category}
+    input() 
 
-        print(f"{category}:\n")
-        for i in sorted(all_distances, key=all_distances.get):
-            print(f"{i}: {all_distances[i]}")
+    #from scripter import jaccard_distance
+    #for category in categories: 
+    #    all_distances = {i: jaccard_distance(category, i) for i in all_categories if i != category}
+
+    #    print(f"{category}:\n")
+    #    for i in sorted(all_distances, key=all_distances.get):
+    #        print(f"{i}: {all_distances[i]}")
 
 
 

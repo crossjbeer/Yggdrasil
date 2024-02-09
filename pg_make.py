@@ -41,7 +41,8 @@ def create_chats(conn):
                 chat_id SERIAL PRIMARY KEY,
                 title VARCHAR(255),
                 date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                interactions INT
+                interactions INT,
+                process VARCHAR(255)
         )
         """)
     
@@ -57,7 +58,10 @@ def create_chat_text(conn):
                 text VARCHAR(255),
                 role VARCHAR(255),
                 chat_ind INT,
-                FOREIGN KEY (chat_id) REFERENCES chats(chat_id)
+                FOREIGN KEY (chat_id) REFERENCES chats(chat_id),
+                process VARCHAR(255),
+                related_chats INT[],
+                date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         """)
     
