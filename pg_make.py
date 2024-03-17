@@ -55,7 +55,7 @@ def create_chat_text(conn):
         CREATE TABLE chat_text (
                 chat_id INT,
                 text_id SERIAL PRIMARY KEY,
-                text VARCHAR(255),
+                text TEXT,
                 role VARCHAR(255),
                 chat_ind INT,
                 FOREIGN KEY (chat_id) REFERENCES chats(chat_id),
