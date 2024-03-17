@@ -365,6 +365,7 @@ def yggy_step(prompt, chatter, embedder, previous_prompts=[], verbose=False, tot
 
     loremaster_reply, loremaster_msg, lm_id = ask_loremaster(prompt, full_igor_summary, chatter, messages=loremaster_dialogue, verbose=verbose, loremaster_prompt=loremaster, connection=connection)
     associated_ids.append(lm_id)
+    print("Returning with associated ids: {}".format(associated_ids))
 
     return(loremaster_reply, loremaster_msg, associated_ids, previous_prompts)
 
