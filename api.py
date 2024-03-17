@@ -1,12 +1,11 @@
-from flask import Flask, Blueprint, request
+from flask import Flask, Blueprint, request, jsonify, render_template, session, redirect, url_for, abort 
 from openai import OpenAI 
 import os
 import argparse
 
-#from parsers import make_parser_gpt_sql
 from parsers import parser_gpt, parser_sql
-
 from pg_chat import connect, grab_chat, new_chat, append_message, recreate_loremaster_dialogue
+from pg_users import hash_password 
 from main import yggy_step
 
 from chatter import Chatter 
@@ -117,7 +116,7 @@ def noting():
 
 
 yggy_blueprint = Blueprint('yggy', __name__)
-@yggy_blueprint.route('/yggy', methods=['GET'])
+@yggy_blueprint.route('/yggy', methods=['POST'])
 def yggy():
     try:
         data = request.args 
@@ -152,14 +151,81 @@ def yggy():
     append_message(connection, chat_id, reply, 'assistant', associated_ids)
 
     return({'response':reply}, 200)
+
+@yggy_blueprint.route('/yggy', methods=['GET'])
+def yggy_page():
+    return render_template('yggy.html')
+
+
+login_blueprint = Blueprint('login', __name__) 
+@login_blueprint.route('/login', methods=['POST'])
+def login():
+    email = request.form.get('email')
+    password = request.form.get('password')
     
+    connection = connect(HOST, PORT, USER, PASSWORD, DATABASE)
+    if(not connection):
+        return({'error':101, 'message':'Could not connect to database'})
+    
+    cursor = connection.cursor()
+    cursor.execute("SELECT user_id, username, passhash, salt FROM users WHERE email = %s", (email,))
+
+    if(not cursor):
+        return({'error':102, 'message':'Could not execute query'})
+    
+    result = cursor.fetchone()
+    if(not result):
+        return({'error':103, 'message':'No user found with that email'})
+    
+    user_id, username, passhash, salt = result
+    cursor.close()
+    connection.close()
+
+    if(hash_password(password, salt) == passhash):
+        session['logged_in'] = True
+
+        # You can also store additional information in the session
+        session['user_id'] = user_id
+        session['username'] = username
+        return redirect(url_for('dashboard'))
+
+    else:
+        #return jsonify({'message': 'Login failed'})
+        return(redirect(url_for('login.login'))
+
+# Optionally, you can define a route for serving the login page
+@login_blueprint.route('/login', methods=['GET'])
+def login_page():
+    return render_template('login.html')  # Assuming you have a login.html template
 
 
-##app.register_blueprint(chat_blueprint)
-##app.register_blueprint(noting_blueprint)
 app.register_blueprint(yggy_blueprint)
+app.register_blueprint(login_blueprint)
+
+@app.route('/dashboard')
+def dashboard():
+    if 'logged_in' in session and session['logged_in']:
+        # User is logged in, allow access to dashboard
+        return render_template('dashboard.html')
+    else:
+        # User is not logged in, redirect to login page
+        return redirect(url_for('login.login'))
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    session.pop('user_id', None)
+    session.pop('username', None)
+    return redirect(url_for('login.login'))
+
+@app.route("/")
+def landing_page():
+    return render_template('index.html')
+
+app.secret_key = os.urandom(24)
+
 if __name__ == '__main__':
     paresr = make_parser()
     args = parser.parse_args()
 
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=8098)

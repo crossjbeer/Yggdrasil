@@ -24,6 +24,11 @@ def make_parser():
 
     return(parser) 
 
+def hash_password(password, salt):
+    salted_password = salt + password
+    passhash = hashlib.sha256(salted_password.encode()).hexdigest()
+    return(passhash)
+
 def new_user(connection, username, password, email, user_metadata, users_table='users', *args, **kwargs):
     cursor = connection.cursor()
     if(not cursor):
@@ -33,8 +38,7 @@ def new_user(connection, username, password, email, user_metadata, users_table='
     salt = secrets.token_hex(16)  # Generate a random 16-byte salt
     
     # Join salt to password and hash the combination
-    salted_password = salt + password
-    passhash = hashlib.sha256(salted_password.encode()).hexdigest()
+    passhash = hash_password(password, salt)
 
     if('is_admin' not in user_metadata):
         user_metadata['is_admin'] = False

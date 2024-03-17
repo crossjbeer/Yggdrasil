@@ -127,9 +127,9 @@ You are a valuable member of our team and I look forward to seeing what you can 
 
 
 TOOLS = {'notes':'Notes written by the GAME MASTER (GM) of a dnd campaign. Useful for specific world information, NPCs, lore, etc. Not useful for rules. This should likely be referenced in most cases.', 
-         'players_handbook':'All information one must know to be a Dungeon and Dragons PLAYER. Includes rules for building characters, designing backgrounds, combat, spells, etc.', 
-         'dungeon_masters_guide':'All information required to be a Dungeons and Dragons GAME MASTER (GM). Contains rules for building encounters, designing campaigns, etc.',
-         'build_a_character': 'A small white-page sheet containing 10 steps on how to build a character.'
+         #'players_handbook':'All information one must know to be a Dungeon and Dragons PLAYER. Includes rules for building characters, designing backgrounds, combat, spells, etc.', 
+         #'dungeon_masters_guide':'All information required to be a Dungeons and Dragons GAME MASTER (GM). Contains rules for building encounters, designing campaigns, etc.',
+         #'build_a_character': 'A small white-page sheet containing 10 steps on how to build a character.'
          }
 
 

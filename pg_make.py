@@ -42,7 +42,8 @@ def create_chats(conn):
                 title VARCHAR(255),
                 date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 interactions INT,
-                process VARCHAR(255)
+                process VARCHAR(255),
+                user_id INT REFERENCES users(user_id)
         )
         """)
     
@@ -171,6 +172,10 @@ def main():
         print("Building Notes Table")
         create_note(conn)
 
+    if(args.users and args.users_table):
+        print("Building Users Table")
+        create_users(conn)
+
     if(args.chats and args.chats_table):
         print("Building Chats Table")
         create_chats(conn)
@@ -178,10 +183,6 @@ def main():
     if(args.chat_text and args.chat_text_table):
         print("Building Chats Text Table")
         create_chat_text(conn)
-
-    if(args.users and args.users_table):
-        print("Building Users Table")
-        create_users(conn)
 
     if(args.planarverses and args.planarverses_table):
         print("Building Planarverses Table")

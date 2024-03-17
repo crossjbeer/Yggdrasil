@@ -74,6 +74,7 @@ def main():
             print(f'File {output_file} already exists, skipping.')
             continue
 
+        print(f"Attempting to download {doc_name} to {output_file}")
         download_doc(service, doc_id, output_file)
         print(f'Successfully downloaded {doc_name} to {output_file}')
 
