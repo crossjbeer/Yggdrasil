@@ -78,7 +78,6 @@ def append_message(connection, chat_id, text, role, associated_ids = [], table_n
         with connection.cursor() as cursor:
             last_ind = get_last_ind(connection, chat_id)
 
-            #insert_query = f"INSERT INTO {table_name} ({chat_id_col}, {text_col}, {role_col}, {chat_ind_col}, {ass_ids_col}) VALUES (%s, %s, %s, %s, %s);"
             if(not len(associated_ids)):
                 insert_query = f"INSERT INTO {table_name} ({chat_id_col}, {text_col}, {role_col}, {chat_ind_col}) VALUES (%s, %s, %s, %s);"
                 values = (chat_id, text, role, last_ind + 1,)
@@ -123,8 +122,8 @@ def new_chat(connection, initial_user_query, process, chats_table='chats', title
 
     try:
         with connection.cursor() as cursor:
-            cursor.execute(f"INSERT INTO {chats_table} (interactions, title, process) VALUES (0, %s, %s);", (title, process,))
-            cursor.execute("SELECT LASTVAL();")
+            cursor.execute(f"INSERT INTO {chats_table} (interactions, title, process) VALUES (0, %s, %s) RETURNING chat_id;", (title, process,))
+            #cursor.execute("SELECT LASTVAL();")
             chat_id = cursor.fetchone()[0]
             return chat_id
         
